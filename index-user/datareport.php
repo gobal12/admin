@@ -197,18 +197,7 @@
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $host = 'localhost';
-                                    $db = 'dbport';
-                                    $user = 'root';
-                                    $pass = '';
-
-                                    // Buat koneksi
-                                    $conn = new mysqli($host, $user, $pass, $db);
-
-                                    // Periksa koneksi
-                                    if ($conn->connect_error) {
-                                        die("Connection failed: " . $conn->connect_error);
-                                    }
+                                    require_once '../db_connection.php';
 
                                     // Filter date
                                     $where = "";

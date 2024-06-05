@@ -163,7 +163,7 @@
                     <p class="mb-4"> Pastikan anda menginputkan data role dengan benar </p>
                     <div class="card">
                         <div class="card-body">
-                            <form id="reportForm">
+                            <form id="reportForm" action="insert_role.php" method="POST">
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="idrole">ID</label>

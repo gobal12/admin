@@ -1,3 +1,14 @@
+<?php
+require_once '../db_connection.php';
+
+$sql = "SELECT id, role_name FROM roles";
+$result = $conn->query($sql);
+
+if (!$result) {
+    die("Error executing query: " . $conn->error);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,6 +33,15 @@
 
     <!-- Custom styles for this page -->
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <!--Konfirmasi Delete -->
+    <script>
+    function confirmDelete(id) {
+        if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+            window.location.href = 'delete-role.php?id=' + id;
+        }
+    }
+    </script>
 
 </head>
 
@@ -182,17 +202,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Tiger Nixon</td>
-                                            <td>System Architect</td>
-                                            <td>
-                                                <a href="edit-role.php">
-                                                    <button type="button" class="btn btn-primary"><i class="fas fa-edit"></i></button>
-                                                </a>
-                                                
-                                                <button type="button" class="btn btn-danger"><i class="far fa-trash-alt"></i></button>
-                                            </td>
-                                        </tr>
+                                    <tbody>
+                                    <?php
+                                            if ($result->num_rows > 0) {
+                                                while($row = $result->fetch_assoc()) {
+                                                    echo "<tr>";
+                                                    echo "<td>" . $row["id"]. "</td>";
+                                                    echo "<td>" . $row["role_name"]. "</td>";
+                                                    echo "<td>
+                                                    <a href='edit-role.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
+                                                    <a href='#' onclick='confirmDelete(event, " . $row["id"] . ")'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
+                                                        </td>";
+                                                    echo "</tr>";
+                                                }
+                                            } else {
+                                                echo "<tr><td colspan='7'>No records found</td></tr>";
+                                            }
+                                        ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -200,7 +226,7 @@
                     </div>
 
                 </div>
-                <!-- /.container-fluid -->
+            <!-- /.container-fluid -->
 
             </div>
             <!-- End of Main Content -->
