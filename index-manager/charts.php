@@ -74,13 +74,6 @@
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="user-role.php">
-                <i class="fas fa-clipboard-list"></i>
-                <span>User Role</span></a>
-             </li>
-
-            <!-- Nav Item - Profile -->
-            <li class="nav-item">
                 <a class="nav-link" href="profile.php">
                 <i class="fas fa-user-alt"></i>
                 <span>Profile</span></a>
