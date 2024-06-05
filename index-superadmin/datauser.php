@@ -189,6 +189,10 @@ if (!$result) {
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
     
+                    <div class="card-header py-3">
+                        <a href="input-user.html" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">ADD USER</a>
+                    </div>
+
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
