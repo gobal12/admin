@@ -1,15 +1,4 @@
-<?php
-require_once '../db_connection.php';
 
-$sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.divisi, u.role_id, r.role_name
-        FROM users u 
-        INNER JOIN roles r ON u.role_id = r.id";
-$result = $conn->query($sql);
-
-if (!$result) {
-    die("Error executing query: " . $conn->error);
-}
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +11,7 @@ if (!$result) {
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Port Report Issues - Data User</title>
+    <title>Port Report Issues - Data Report</title>
 
     <!-- Custom fonts for this template -->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -46,14 +35,13 @@ if (!$result) {
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
-                <div class="sidebar-brand-text mx-3">Port Report Issues</div>
+            <!-- Sidebar - -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="form3.php">
+                <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
             </a>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
@@ -86,13 +74,6 @@ if (!$result) {
                 <i class="fas fa-clipboard-list"></i>
                 <span>User</span></a>
             </li>
-
-            <!-- Nav Item - Profile -->
-            <li class="nav-item">
-                <a class="nav-link" href="user-role.php">
-                <i class="fas fa-clipboard-list"></i>
-                <span>User Role</span></a>
-             </li>
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
@@ -143,12 +124,17 @@ if (!$result) {
                         </div>
                     </form>
 
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome Back!!</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome Back !!</span>
                                 <img class="img-profile rounded-circle"
                                     src="../img/undraw_profile.svg">
                             </a>
@@ -176,47 +162,89 @@ if (!$result) {
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">User</h1>
-                    <p class="mb-4">Menampilkan list user yang telah terdaftar pada cms Port Report Issues</p>
+                    <h1 class="h3 mb-2 text-gray-800">Data Report</h1>
+                    <p class="mb-4">Data Report menampilkan list report yang telah anda submit.</p>
+
+                    <!-- Filter Form -->
+                    <form method="GET" action="">
+                        <div class="form-group row">
+                            <label for="start_date" class="col-sm-2 col-form-label">Start Date</label>
+                            <div class="col-sm-4">
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo isset($_GET['start_date']) ? $_GET['start_date'] : ''; ?>">
+                            </div>
+                            <label for="end_date" class="col-sm-2 col-form-label">End Date</label>
+                            <div class="col-sm-4">
+                                <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo isset($_GET['end_date']) ? $_GET['end_date'] : ''; ?>">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </form>
+                    <br>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
-    
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">List Report</h6>
+                        </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>id</th>
-                                            <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Divisi</th>
-                                            <th>Role</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                            if ($result->num_rows > 0) {
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo "<tr>";
-                                                    echo "<td>" . $row["id"]. "</td>";
-                                                    echo "<td>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
-                                                    echo "<td>" . $row["email"]. "</td>";
-                                                    echo "<td>" . $row["divisi"]. "</td>";
-                                                    echo "<td>" . $row["role_name"]. "</td>";
-                                                    echo "<td>
-                                                            <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                            <a id='deleteBtn".$row["id"]."' href='delete-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-danger' onclick='confirmDelete(".$row["id"].")'><i class='far fa-trash-alt'></i></button></a>
-                                                            </td>";
-                                                    echo "</tr>";
-                                                }
-                                            } else {
-                                                echo "<tr><td colspan='7'>No records found</td></tr>";
-                                            }
-                                        ?>
-                                    </tbody>
-                                </table>
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Nomor</th>
+                                        <th>Nama Pelabuhan</th>
+                                        <th>Nomor Tiket</th>
+                                        <th>Tanggal Open</th>
+                                        <th>Tanggal Close</th>
+                                        <th>Downtime (Menit)</th>
+                                        <th>Jenis Perangkat</th>
+                                        <th>Lokasi Perangkat</th>
+                                        <th>Layanan Terdampak</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    require_once '../db_connection.php';
+
+                                    // Filter date
+                                    $where = "";
+                                    if (isset($_GET['start_date']) && isset($_GET['end_date']) && !empty($_GET['start_date']) && !empty($_GET['end_date'])) {
+                                        $start_date = $_GET['start_date'];
+                                        $end_date = $_GET['end_date'];
+                                        $where = "WHERE tanggal_open >= '$start_date' AND tanggal_close <= '$end_date'";
+                                    }
+
+                                    $sql = "SELECT * FROM report $where";
+                                    $result = $conn->query($sql);
+
+                                    if ($result->num_rows > 0) {
+                                        while($row = $result->fetch_assoc()) {
+                                            $tanggalOpen = new DateTime($row["tanggal_open"]);
+                                            $tanggalClose = new DateTime($row["tanggal_close"]);
+                                            $downtime = $tanggalOpen->diff($tanggalClose);
+                                            $downtimeMinutes = ($downtime->days * 24 * 60) + ($downtime->h * 60) + $downtime->i;
+
+                                            echo "<tr>
+                                                    <td>" . $row["id_report"]. "</td>
+                                                    <td>" . $row["pelabuhan"]. "</td>
+                                                    <td>" . $row["nomor_tiket"]. "</td>
+                                                    <td>" . $row["tanggal_open"]. "</td>
+                                                    <td>" . $row["tanggal_close"]. "</td>
+                                                    <td>" . $downtimeMinutes. "</td>
+                                                    <td>" . $row["jenis_perangkat"]. "</td>
+                                                    <td>" . $row["lokasi_perangkat"]. "</td>
+                                                    <td>" . $row["layanan_terdampak"]. "</td>
+                                                    <td>" . $row["keterangan"]. "</td>
+                                                </tr>";
+                                        }
+                                    } else {
+                                        echo "0 results";
+                                    }
+                                    $conn->close();
+                                    ?>
+                                </tbody>
+                            </table>
                             </div>
                         </div>
                     </div>
@@ -231,7 +259,7 @@ if (!$result) {
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>
+                        <span>Copyright &copy; Your Website 2023</span>
                     </div>
                 </div>
             </footer>
@@ -284,19 +312,6 @@ if (!$result) {
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
-    
-    <script>
-    function confirmDelete(id) {
-        // Munculkan konfirmasi popup
-        var confirmation = confirm("Are you sure you want to delete this user?");
-
-        // Jika pengguna menekan OK
-        if (confirmation) {
-            // Ubah atribut href tombol "Delete" menjadi URL yang sesuai
-            document.getElementById("deleteBtn"+id).href = "delete-user.php?id=" + id;
-        }
-    }
-    </script>
 
 </body>
 

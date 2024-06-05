@@ -1,17 +1,5 @@
-<?php
-require_once '../db_connection.php';
-
-$sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.divisi, u.role_id, r.role_name
-        FROM users u 
-        INNER JOIN roles r ON u.role_id = r.id";
-$result = $conn->query($sql);
-
-if (!$result) {
-    die("Error executing query: " . $conn->error);
-}
-?>
-
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -22,19 +10,16 @@ if (!$result) {
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Port Report Issues - Data User</title>
+    <title>Port Report Issues - Dashboard</title>
 
-    <!-- Custom fonts for this template -->
+    <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
-    <!-- Custom styles for this template -->
+    <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
-
-    <!-- Custom styles for this page -->
-    <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 </head>
 
@@ -86,13 +71,6 @@ if (!$result) {
                 <i class="fas fa-clipboard-list"></i>
                 <span>User</span></a>
             </li>
-
-            <!-- Nav Item - Profile -->
-            <li class="nav-item">
-                <a class="nav-link" href="user-role.php">
-                <i class="fas fa-clipboard-list"></i>
-                <span>User Role</span></a>
-             </li>
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
@@ -171,52 +149,66 @@ if (!$result) {
 
                 </nav>
                 <!-- End of Topbar -->
-
+                
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">User</h1>
-                    <p class="mb-4">Menampilkan list user yang telah terdaftar pada cms Port Report Issues</p>
+                    <h1 class="h3 mb-2 text-gray-800">Dashboard</h1>
 
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-    
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>id</th>
-                                            <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Divisi</th>
-                                            <th>Role</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                            if ($result->num_rows > 0) {
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo "<tr>";
-                                                    echo "<td>" . $row["id"]. "</td>";
-                                                    echo "<td>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
-                                                    echo "<td>" . $row["email"]. "</td>";
-                                                    echo "<td>" . $row["divisi"]. "</td>";
-                                                    echo "<td>" . $row["role_name"]. "</td>";
-                                                    echo "<td>
-                                                            <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                            <a id='deleteBtn".$row["id"]."' href='delete-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-danger' onclick='confirmDelete(".$row["id"].")'><i class='far fa-trash-alt'></i></button></a>
-                                                            </td>";
-                                                    echo "</tr>";
-                                                }
-                                            } else {
-                                                echo "<tr><td colspan='7'>No records found</td></tr>";
-                                            }
-                                        ?>
-                                    </tbody>
-                                </table>
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <div class="col-xl-8 col-lg-7">
+
+                            <!-- Area Chart Jenis Perangkat -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Jenis Perangkat</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-area">
+                                        <canvas id="jenisPerangkatChart"></canvas>
+                                    </div>
+                                    <hr>
+                                    Styling for the area chart can be found in the
+                                    <code>/js/demo/chart-area-demo.js</code> file.
+                                </div>
+                            </div>
+
+                            <!-- Bar Chart -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Lokasi Perangkat</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-bar">
+                                        <canvas id="myBarChart"></canvas>
+                                    </div>
+                                    <hr>
+                                    Styling for the bar chart can be found in the
+                                    <code>/js/demo/chart-bar-demo.js</code> file.
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Donut Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Layanan Terdampak</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="chart-pie pt-4">
+                                        <canvas id="myPieChart"></canvas>
+                                    </div>
+                                    <hr>
+                                    Styling for the donut chart can be found in the
+                                    <code>/js/demo/chart-pie-demo.js</code> file.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -231,7 +223,7 @@ if (!$result) {
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>
+                        <span>Copyright &copy; MI 2024</span>
                     </div>
                 </div>
             </footer>
@@ -279,24 +271,87 @@ if (!$result) {
     <script src="../js/sb-admin-2.min.js"></script>
 
     <!-- Page level plugins -->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="../vendor/chart.js/Chart.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="../js/demo/datatables-demo.js"></script>
-    
-    <script>
-    function confirmDelete(id) {
-        // Munculkan konfirmasi popup
-        var confirmation = confirm("Are you sure you want to delete this user?");
+    <script src="../js/demo/chart-area-demo.js"></script>
+    <script src="../js/demo/chart-pie-demo.js"></script>
+    <script src="../js/demo/chart-bar-demo.js"></script>
 
-        // Jika pengguna menekan OK
-        if (confirmation) {
-            // Ubah atribut href tombol "Delete" menjadi URL yang sesuai
-            document.getElementById("deleteBtn"+id).href = "delete-user.php?id=" + id;
-        }
-    }
-    </script>
+
+    <script>
+    fetch('getData.php')
+        .then(response => response.json())
+        .then(data => {
+            const jenisPerangkatData = {};
+            const lokasiPerangkatData = {};
+            const layananTerdampakData = {};
+
+            data.forEach(item => {
+                // Jenis Perangkat
+                if (item.jenis_perangkat && item.jenis_perangkat !== 'null') {
+                    if (jenisPerangkatData[item.jenis_perangkat]) {
+                        jenisPerangkatData[item.jenis_perangkat]++;
+                    } else {
+                        jenisPerangkatData[item.jenis_perangkat] = 1;
+                    }
+                }
+
+                // Lokasi Perangkat
+                if (item.lokasi_perangkat && item.lokasi_perangkat !== 'null') {
+                    if (lokasiPerangkatData[item.lokasi_perangkat]) {
+                        lokasiPerangkatData[item.lokasi_perangkat]++;
+                    } else {
+                        lokasiPerangkatData[item.lokasi_perangkat] = 1;
+                    }
+                }
+
+                // Layanan Terdampak
+                if (item.layanan_terdampak && item.layanan_terdampak !== 'null') {
+                    const layananArray = item.layanan_terdampak.split(',');
+                    layananArray.forEach(layanan => {
+                        if (layanan && layanan !== 'null') {
+                            if (layananTerdampakData[layanan]) {
+                                layananTerdampakData[layanan]++;
+                            } else {
+                                layananTerdampakData[layanan] = 1;
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Urutkan data berdasarkan kunci (0, 1, 2, 3, ...)
+            const sortData = (data) => {
+                const sortedKeys = Object.keys(data).sort((a, b) => a - b);
+                const sortedData = {};
+                sortedKeys.forEach(key => {
+                    sortedData[key] = data[key];
+                });
+                return sortedData;
+            };
+
+            const sortedJenisPerangkatData = sortData(jenisPerangkatData);
+            const sortedLokasiPerangkatData = sortData(lokasiPerangkatData);
+            const sortedLayananTerdampakData = sortData(layananTerdampakData);
+
+            // Data untuk chart Jenis Perangkat
+            const jenisPerangkatLabels = Object.keys(sortedJenisPerangkatData);
+            const jenisPerangkatValues = Object.values(sortedJenisPerangkatData).map(value => parseInt(value));
+
+            // Data untuk chart Lokasi Perangkat
+            const lokasiPerangkatLabels = Object.keys(sortedLokasiPerangkatData);
+            const lokasiPerangkatValues = Object.values(sortedLokasiPerangkatData).map(value => parseInt(value));
+
+            // Data untuk chart Layanan Terdampak
+            const layananTerdampakLabels = Object.keys(sortedLayananTerdampakData);
+            const layananTerdampakValues = Object.values(sortedLayananTerdampakData).map(value => parseInt(value));
+
+        });
+</script>
+
+    
+    
 
 </body>
 
