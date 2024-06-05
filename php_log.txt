@@ -1,0 +1,9 @@
+Array
+(
+    [nomor_tiket] => 
+    [tanggal] => 
+    [jenis_perangkat] => 
+    [lokasi_perangkat] => 
+    [layanan_terdampak] => Checkin Kendaraan Reguler, Checkin Kendaraan Eksekutif, Checkin Kendaraan Motor, Cetak Tiket Pejalan Kaki Reguler, Cetak Tiket Pejalan Kaki Eksekutif
+    [keterangan] => 
+)
