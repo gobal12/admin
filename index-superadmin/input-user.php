@@ -34,7 +34,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-text mx-3">Port Report Issues</div>
             </a>
 
@@ -74,14 +74,14 @@
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="user-role.html">
+                <a class="nav-link" href="user-role.php">
                     <i class="fas fa-clipboard-list"></i>
                     <span>User Role</span></a>
             </li>
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="profile.html">
+                <a class="nav-link" href="profile.php">
                     <i class="fas fa-user-alt"></i>
                     <span>Profile</span></a>
             </li>
@@ -138,7 +138,7 @@
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                             aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="profile.html">
+                            <a class="dropdown-item" href="profile.php">
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Profile
                             </a>

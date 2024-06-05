@@ -1,12 +1,15 @@
 <?php
-
 require_once '../db_connection.php';
 
-$sql = "SELECT id, first_name, last_name, email, divisi, role_id FROM users";
+$sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.divisi, u.role_id, r.role_name
+        FROM users u 
+        INNER JOIN roles r ON u.role_id = r.id";
 $result = $conn->query($sql);
 
+if (!$result) {
+    die("Error executing query: " . $conn->error);
+}
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -44,7 +47,7 @@ $result = $conn->query($sql);
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-text mx-3">Port Report Issues</div>
             </a>
 
@@ -86,14 +89,14 @@ $result = $conn->query($sql);
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="user-role.html">
+                <a class="nav-link" href="user-role.php">
                 <i class="fas fa-clipboard-list"></i>
                 <span>User Role</span></a>
              </li>
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="profile.html">
+                <a class="nav-link" href="profile.php">
                 <i class="fas fa-user-alt"></i>
                 <span>Profile</span></a>
             </li>
@@ -192,29 +195,30 @@ $result = $conn->query($sql);
                                             <th>id</th>
                                             <th>Nama</th>
                                             <th>Email</th>
+                                            <th>Divisi</th>
                                             <th>Role</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
-                                        if ($result->num_rows > 0) {
-                                            while($row = $result->fetch_assoc()) {
-                                                echo "<tr>";
-                                                echo "<td>" . $row["id"]. "</td>";
-                                                echo "<td>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
-                                                echo "<td>" . $row["email"]. "</td>";
-                                                echo "<td>" . $row["divisi"]. "</td>";
-                                                echo "<td>" . $row["role_id"]. "</td>";
-                                                echo "<td>
-                                                        <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                        <a id='deleteBtn".$row["id"]."' href='delete-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-danger' onclick='confirmDelete(".$row["id"].")'><i class='far fa-trash-alt'></i></button></a>
-                                                        </td>";
-                                                echo "</tr>";
+                                            if ($result->num_rows > 0) {
+                                                while($row = $result->fetch_assoc()) {
+                                                    echo "<tr>";
+                                                    echo "<td>" . $row["id"]. "</td>";
+                                                    echo "<td>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
+                                                    echo "<td>" . $row["email"]. "</td>";
+                                                    echo "<td>" . $row["divisi"]. "</td>";
+                                                    echo "<td>" . $row["role_name"]. "</td>";
+                                                    echo "<td>
+                                                            <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
+                                                            <a id='deleteBtn".$row["id"]."' href='delete-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-danger' onclick='confirmDelete(".$row["id"].")'><i class='far fa-trash-alt'></i></button></a>
+                                                            </td>";
+                                                    echo "</tr>";
+                                                }
+                                            } else {
+                                                echo "<tr><td colspan='7'>No records found</td></tr>";
                                             }
-                                        } else {
-                                            echo "<tr><td colspan='7'>No records found</td></tr>";
-                                        }
                                         ?>
                                     </tbody>
                                 </table>
