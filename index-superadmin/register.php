@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($conn->query($sql) === TRUE) {
             echo "<script>
                     alert('New record created successfully');
-                    window.location.href = '../index.php';
+                    window.location.href = 'datauser.php';
                   </script>";
         } else {
             echo "<script>
