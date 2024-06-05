@@ -1,5 +1,4 @@
 <?php
-
 require_once '../db_connection.php';
 
 $sql = "SELECT id_perangkat, nama_perangkat FROM jenis_perangkat";

@@ -16,7 +16,7 @@
 <body id="page-top">
     <div id="wrapper">
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="form3.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="form3.php">
                 <div class="sidebar-brand-text mx-3"><b>Port Report Issues</b></div>
             </a>
             <hr class="sidebar-divider my-0">
@@ -49,14 +49,21 @@
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="datauser.html">
+                <a class="nav-link" href="datauser.php">
                 <i class="fas fa-clipboard-list"></i>
                 <span>User</span></a>
             </li>
 
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="profile.html">
+                <a class="nav-link" href="user-role.php">
+                <i class="fas fa-clipboard-list"></i>
+                <span>User Role</span></a>
+             </li>
+
+            <!-- Nav Item - Profile -->
+            <li class="nav-item">
+                <a class="nav-link" href="profile.php">
                 <i class="fas fa-user-alt"></i>
                 <span>Profile</span></a>
             </li>
@@ -108,7 +115,7 @@
                                 <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="profile.html">
+                                <a class="dropdown-item" href="profile.php">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
                                 </a>
                                 <div class="dropdown-divider"></div>
@@ -197,7 +204,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="logout.php">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
             </div>
         </div>
