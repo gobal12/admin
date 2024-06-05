@@ -1,69 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link href="../css/sb-admin-2.min.css" rel="stylesheet">
-</head>
-<body class="bg-gradient-primary">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-10 col-lg-12 col-md-9">
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-0">
-                        <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-register-image"></div>
-                            <div class="col-lg-6">
-                                <div class="p-5">
-                                    <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
-                                    </div>
-                                    <form class="user" action="register.php" method="post">
-                                        <div class="form-group row">
-                                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                                <input type="text" class="form-control form-control-user" id="FirstName" name="FirstName" placeholder="First Name">
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="text" class="form-control form-control-user" id="LastName" name="LastName" placeholder="Last Name">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="email" class="form-control form-control-user" id="Email" name="Email" placeholder="Email Address">
-                                        </div>
-                                        <div class="form-group row">
-                                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                                <input type="text" class="form-control form-control-user" id="Divisi" name="Divisi" placeholder="Divisi">
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <select class="form-control form-control-user" id="Role" name="Role">
-                                                    <option value="admin">Admin</option>
-                                                    <option value="user">User</option>
-                                                    <option value="manager">Manager</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                                <input type="password" class="form-control form-control-user" id="Password" name="Password" placeholder="Password">
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <input type="password" class="form-control form-control-user" id="RepeatPassword" name="RepeatPassword" placeholder="Repeat Password">
-                                            </div>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">Register Account</button>
-                                    </form>
-                                    <hr>
-                                    <div class="text-center">
-                                        <a class="small" href="../index.php">Already have an account? Login!</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $firstName = $_POST['FirstName'];
+    $lastName = $_POST['LastName'];
+    $email = $_POST['Email'];
+    $divisi = $_POST['Divisi'];
+    $role = $_POST['Role'];
+    $plainPassword = $_POST['Password'];
+    $hashedPassword = password_hash($plainPassword, PASSWORD_BCRYPT);
+
+    require_once '../db_connection.php';
+
+    // Get role_id from roles table
+    $roleQuery = "SELECT id FROM roles WHERE role_name='$role'";
+    $roleResult = $conn->query($roleQuery);
+    if ($roleResult->num_rows > 0) {
+        $roleRow = $roleResult->fetch_assoc();
+        $roleId = $roleRow['id'];
+
+        $sql = "INSERT INTO users (first_name, last_name, email, divisi, role_id, password) VALUES ('$firstName', '$lastName', '$email', '$divisi', '$roleId', '$hashedPassword')";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "<script>
+                    alert('New record created successfully');
+                    window.location.href = 'datauser.php';
+                  </script>";
+        } else {
+            echo "<script>
+                    alert('Error: " . $sql . "<br>" . $conn->error . "');
+                    window.location.href = 'register.php';
+                  </script>";
+        }
+    } else {
+        echo "<script>
+                alert('Invalid role selected');
+                window.location.href = 'register.php';
+              </script>";
+    }
+
+    $conn->close();
+}
+?>

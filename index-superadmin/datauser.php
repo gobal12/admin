@@ -208,8 +208,8 @@ $result = $conn->query($sql);
                                                 echo "<td>" . $row["role_id"]. "</td>";
                                                 echo "<td>
                                                         <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                        <a href='delete-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
-                                                    </td>";
+                                                        <a id='deleteBtn".$row["id"]."' href='delete-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-danger' onclick='confirmDelete(".$row["id"].")'><i class='far fa-trash-alt'></i></button></a>
+                                                        </td>";
                                                 echo "</tr>";
                                             }
                                         } else {
@@ -285,6 +285,19 @@ $result = $conn->query($sql);
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
+    
+    <script>
+    function confirmDelete(id) {
+        // Munculkan konfirmasi popup
+        var confirmation = confirm("Are you sure you want to delete this user?");
+
+        // Jika pengguna menekan OK
+        if (confirmation) {
+            // Ubah atribut href tombol "Delete" menjadi URL yang sesuai
+            document.getElementById("deleteBtn"+id).href = "delete-user.php?id=" + id;
+        }
+    }
+    </script>
 
 </body>
 
