@@ -599,11 +599,6 @@ $last_name = $_SESSION['last_name'];
             .catch(error => console.error('Error fetching data:', error));
     </script>
     
-    <!--<script src="../js/demo/chart-pie-demo.js"></script>
-    <script src="../js/demo/chart-area-demo.js"></script>
-    <script src="../js/demo/chart-bar-demo.js"></script> -->
-
-    
     
 
 </body>
