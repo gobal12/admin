@@ -1,5 +1,5 @@
 <?php
-require_once '../db_connection.php';
+require_once 'db_connection.php';
 
 // Assuming you have a session started and user ID stored in session
 session_start();

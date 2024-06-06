@@ -1,16 +1,5 @@
 <?php
-header('Content-Type: application/json');
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "dbport";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once 'db_connection.php';
 
 $sql = "SELECT jenis_perangkat, COUNT(*) as count FROM report GROUP BY jenis_perangkat";
 $result = $conn->query($sql);
