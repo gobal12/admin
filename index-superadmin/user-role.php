@@ -1,14 +1,25 @@
 <?php
-require_once '../db_connection.php';
+session_start();
 
-$sql = "SELECT id, role_name FROM roles";
-
-$result = $conn->query($sql);
-
-if (!$result) {
-    die("Error executing query: " . $conn->error);
+// Misalnya, kita membuat fungsi bernama check_role()
+function check_role($required_role) {
+    // Cek apakah peran pengguna sesuai dengan peran yang diperlukan
+    if ($_SESSION['role'] !== $required_role) {
+        // Jika tidak sesuai, arahkan pengguna ke halaman akses ditolak
+        header("Location: ../access_denied.html");
+        exit();
+    }
 }
+
+// Periksa akses hanya untuk admin
+check_role('admin');
+
+// Fetch the user's first and last names from the session
+$first_name = $_SESSION['first_name'];
+$last_name = $_SESSION['last_name'];
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

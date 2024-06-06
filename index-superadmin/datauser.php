@@ -1,6 +1,5 @@
 <?php
 session_start();
-echo "Peran Pengguna: ".$_SESSION['role'];
 
 // Misalnya, kita membuat fungsi bernama check_role()
 function check_role($required_role) {
@@ -15,6 +14,9 @@ function check_role($required_role) {
 // Periksa akses hanya untuk admin
 check_role('admin');
 
+// Fetch the user's first and last names from the session
+$first_name = $_SESSION['first_name'];
+$last_name = $_SESSION['last_name'];
 
 require_once '../db_connection.php';
 
