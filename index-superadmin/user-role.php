@@ -58,17 +58,17 @@ if (!$result) {
     <!--Konfirmasi Delete -->
     <script>
     function confirmDelete(id, event) {
-    // Prevent the default action of the link
-    event.preventDefault();
+        // Prevent the default action of the link
+        event.preventDefault();
 
-    // Show the confirmation popup
-    var confirmation = confirm("Are you sure you want to delete this role?");
+        // Show the confirmation popup
+        var confirmation = confirm("Are you sure you want to delete this role?");
 
-    // If the user clicks "OK"
-    if (confirmation) {
-        // Redirect to the delete URL
-        window.location.href = "delete-role.php?id=" + id;
-    }
+        // If the user clicks "OK"
+        if (confirmation) {
+            // Redirect to the delete URL
+            window.location.href = "delete-role.php?id=" + id;
+        }
     }
     </script>
 
@@ -89,7 +89,6 @@ if (!$result) {
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
@@ -115,7 +114,6 @@ if (!$result) {
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
-
             <!-- Nav Item - Profile -->
             <li class="nav-item">
                 <a class="nav-link" href="datauser.php">
@@ -136,7 +134,6 @@ if (!$result) {
                 <i class="fas fa-user-alt"></i>
                 <span>Profile</span></a>
             </li>
-
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
@@ -231,23 +228,22 @@ if (!$result) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <tbody>
                                     <?php
-                                            if ($result->num_rows > 0) {
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo "<tr>";
-                                                    echo "<td>" . $row["id"]. "</td>";
-                                                    echo "<td>" . $row["role_name"]. "</td>";
-                                                    echo "<td>
-                                                            <a href='edit-role.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                            <a href='#' onclick='confirmDelete(" . $row["id"] . ", event)'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
-                                                            </td>";
-                                                    echo "</tr>";
-                                                }
-                                            } else {
-                                                echo "<tr><td colspan='7'>No records found</td></tr>";
-                                            }
-                                        ?>
+                                    if ($result->num_rows > 0) {
+                                        while($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $row["id"]. "</td>";
+                                            echo "<td>" . $row["role_name"]. "</td>";
+                                            echo "<td>
+                                                    <a href='edit-role.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
+                                                    <a href='#' onclick='confirmDelete(" . $row["id"] . ", event)'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
+                                                    </td>";
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='3'>No records found</td></tr>";
+                                    }
+                                    ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -316,7 +312,11 @@ if (!$result) {
     <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="../js/demo/datatables-demo.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
+    });
+    </script>
 
 </body>
 

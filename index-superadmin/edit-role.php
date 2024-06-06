@@ -1,4 +1,23 @@
 <?php
+session_start();
+
+// Misalnya, kita membuat fungsi bernama check_role()
+function check_role($required_role) {
+    // Cek apakah peran pengguna sesuai dengan peran yang diperlukan
+    if ($_SESSION['role'] !== $required_role) {
+        // Jika tidak sesuai, arahkan pengguna ke halaman akses ditolak
+        header("Location: ../access_denied.html");
+        exit();
+    }
+}
+
+// Periksa akses hanya untuk admin
+check_role('admin');
+
+// Fetch the user's first and last names from the session
+$first_name = $_SESSION['first_name'];
+$last_name = $_SESSION['last_name'];
+
 require_once '../db_connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -189,21 +208,17 @@ $conn->close();
                     <p class="mb-4"> Pastikan anda menginputkan data role degan benar </p>
                     <div class="card">
                         <div class="card-body">
-                            <form id="reportForm">
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="idrole">ID</label>
-                                        <input type="text" class="form-control" id="idrole" name="idrole" placeholder="id role">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="rolename">Role Name</label>
-                                        <input type="text" class="form-control" id="rolename" name="rolename" placeholder="role name">
-                                    </div>
-
-                                <button type="submit" class="btn btn-primary">Edit</button>
-                                
-                                <button type="button" class="btn btn-danger">Cancel</button>
-                            </form>
+                            <form class="role" method="post" action="edit-role.php">
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-user" id="id" name="id" placeholder="id" value="<?php echo $user['id']; ?>">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-user" id="role_name" name="role_name" placeholder="Role Name" value="<?php echo $user['role_name']; ?>">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                    Update Role
+                                </button>
+                            </form>                            
                         </div>
                     </div>
                 </div>
