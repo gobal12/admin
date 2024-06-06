@@ -57,7 +57,7 @@ $last_name = $_SESSION['last_name'];
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="form3.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
                 <div class="sidebar-brand-text mx-3">Port Report Issues</div>
             </a>
 
@@ -276,7 +276,7 @@ $last_name = $_SESSION['last_name'];
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="logout.php">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
             </div>
         </div>
@@ -324,7 +324,7 @@ $last_name = $_SESSION['last_name'];
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('getData1.php')
+            fetch('../getData1.php')
             .then(response => response.json())
             .then(data => {
                 const labels = data.map(item => item.jenis_perangkat);
@@ -451,7 +451,7 @@ $last_name = $_SESSION['last_name'];
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('getData2.php')
+            fetch('../getData2.php')
             .then(response => response.json())
             .then(data => {
                 const labels = data.map(item => item.lokasi_perangkat);
@@ -543,7 +543,7 @@ $last_name = $_SESSION['last_name'];
 
     <!-- Script Buat Pie Chart -->
     <script>
-       fetch('getData3.php')
+       fetch('../getData3.php')
             .then(response => response.json())
             .then(data => {
                 const layanan_terdampak = data.map(item => item.layanan_terdampak);

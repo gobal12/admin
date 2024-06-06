@@ -37,7 +37,7 @@ $last_name = $_SESSION['last_name'];
 <body id="page-top">
     <div id="wrapper">
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="form3.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
                 <div class="sidebar-brand-text mx-3"><b>Port Report Issues</b></div>
             </a>
             <hr class="sidebar-divider my-0">
@@ -243,7 +243,7 @@ $last_name = $_SESSION['last_name'];
         };
     
         function loadDeviceTypes() {
-            fetch('get_device_types.php')
+            fetch('../get_device_types.php')
                 .then(response => response.json())
                 .then(data => {
                     const deviceDropdown = document.getElementById('jenisperangkat');
@@ -260,7 +260,7 @@ $last_name = $_SESSION['last_name'];
             const lokasiPerangkatDropdown = document.getElementById('lokasiperangkat');
             lokasiPerangkatDropdown.innerHTML = '<option selected>Choose...</option>';
     
-            fetch(`get_locations.php?device_type_id=${deviceTypeId}`)
+            fetch(`../get_locations.php?device_type_id=${deviceTypeId}`)
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(location => {
@@ -273,7 +273,7 @@ $last_name = $_SESSION['last_name'];
         }
     
         function loadLayananCheckboxes() {
-            fetch('get_layanan.php')
+            fetch('../get_layanan.php')
                 .then(response => response.json())
                 .then(data => {
                     const layananCheckboxes = document.getElementById('layananCheckboxes');
@@ -319,7 +319,7 @@ $last_name = $_SESSION['last_name'];
 
         console.log('Submitting data:', data);
 
-        fetch('submit_report.php', {
+        fetch('../submit_report.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

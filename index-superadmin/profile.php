@@ -56,7 +56,7 @@ $last_name = $_SESSION['last_name'];
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
                 <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
             </a>
 
@@ -297,7 +297,7 @@ $last_name = $_SESSION['last_name'];
     $(document).ready(function() {
         // Fetch profile data via AJAX
         $.ajax({
-            url: 'get_profile.php',
+            url: '../get_profile.php',
             type: 'GET',
             dataType: 'json',
             success: function(response) {

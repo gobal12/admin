@@ -56,7 +56,7 @@ $last_name = $_SESSION['last_name'];
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="form3.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
                 <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
             </a>
 
