@@ -1,6 +1,5 @@
 <?php
 session_start();
-echo "Peran Pengguna: ".$_SESSION['role'];
 
 // Misalnya, kita membuat fungsi bernama check_role()
 function check_role($required_role) {
@@ -14,6 +13,11 @@ function check_role($required_role) {
 
 // Periksa akses hanya untuk admin
 check_role('user');
+
+// Fetch the user's first and last names from the session
+$first_name = $_SESSION['first_name'];
+$last_name = $_SESSION['last_name'];
+
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +86,7 @@ check_role('user');
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
+    
             <!-- Nav Item - Profile -->
             <li class="nav-item">
                 <a class="nav-link" href="profile.php">
@@ -140,9 +144,9 @@ check_role('user');
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome Back !!!</span>
-                                <img class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($first_name) . ' ' . htmlspecialchars($last_name); ?>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -177,42 +181,33 @@ check_role('user');
                         <div class="card-group">
                             <div class="card">
                                 <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <form>
-                                        <fieldset disabled>
-                                          <div class="form-group">
-                                            <label for="disabledTextInput">Email</label>
-                                            <input type="text" id="email" class="form-control" placeholder="Email" name="email">
-                                          </div>
-                                          <div class="form-group">
-                                            <label for="disabledTextInput">Password</label>
-                                            <input type="password" id="password" class="form-control" placeholder="Password" name="password">
-                                          </div>
-                                    </form>
-                                </div>
                             </div>
                             <div class="card">
                                 <div class="card-body">
                                   <h5 class="card-title">Data Diri</h5>
                                   <form>
-                                    <fieldset disabled>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">First Name</label>
-                                        <input type="text" id="firstname" class="form-control" placeholder="firstname" name="firstname">
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">Last Name</label>
-                                        <input type="text" id="lastname" class="form-control" placeholder="lastname" name="lastname">
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">Divisi</label>
-                                        <input type="text" id="divisi" class="form-control" placeholder="divisi" name="divisi">
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">Role</label>
-                                        <input type="text" id="role" class="form-control" placeholder="role" name="role">
-                                      </div>
-                                  </form>
+                                        <fieldset disabled>
+                                            <div class="form-group">
+                                                <label for="firstname">First Name</label>
+                                                <input type="text" id="firstname" class="form-control" placeholder="First Name" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="lastname">Last Name</label>
+                                                <input type="text" id="lastname" class="form-control" placeholder="Last Name" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input type="text" id="email" class="form-control" placeholder="Email" disabled>
+                                            </div>                                            
+                                            <div class="form-group">
+                                                <label for="divisi">Divisi</label>
+                                                <input type="text" id="divisi" class="form-control" placeholder="Divisi" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="disabledTextInput">Role</label>
+                                                <input type="text" id="role" class="form-control" placeholder="role" value="<?php echo htmlspecialchars($_SESSION['role']); ?>">
+                                            </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -281,6 +276,34 @@ check_role('user');
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
+
+    <!--Ambil Data Profile-->
+    <script>
+    $(document).ready(function() {
+        // Fetch profile data via AJAX
+        $.ajax({
+            url: 'get_profile.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#email').val(response.data.email);
+                    $('#firstname').val(response.data.first_name);
+                    $('#lastname').val(response.data.last_name);
+                    $('#divisi').val(response.data.divisi);
+                } else {
+                    console.log(response.message);
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("AJAX Error: " + status + ": " + error);
+                alert('Failed to fetch profile data.');
+            }
+        });
+    });
+    </script>
+
 
 </body>
 

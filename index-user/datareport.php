@@ -1,6 +1,5 @@
 <?php
 session_start();
-echo "Peran Pengguna: ".$_SESSION['role'];
 
 // Misalnya, kita membuat fungsi bernama check_role()
 function check_role($required_role) {
@@ -14,6 +13,11 @@ function check_role($required_role) {
 
 // Periksa akses hanya untuk admin
 check_role('user');
+
+// Fetch the user's first and last names from the session
+$first_name = $_SESSION['first_name'];
+$last_name = $_SESSION['last_name'];
+
 ?>
 
 <!DOCTYPE html>
@@ -142,9 +146,9 @@ check_role('user');
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome Back !!</span>
-                                <img class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($first_name) . ' ' . htmlspecialchars($last_name); ?>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
