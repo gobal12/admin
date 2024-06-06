@@ -1,37 +1,32 @@
 <?php
 require_once '../db_connection.php';
 
-// Periksa koneksi
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Periksa apakah ID telah diberikan
-if(isset($_GET['id'])) {
-    // Sanitasi ID
-    $id = htmlspecialchars($_GET['id']);
-
-    // Persiapkan statement SQL untuk menghapus data
-    $stmt = $conn->prepare("DELETE FROM roles WHERE id = ?");
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["id"])) {
+    // Mengambil ID dari parameter GET
+    $id = $_GET["id"];
+    
+    // Mempersiapkan pernyataan SQL dengan parameter
+    $sql = "DELETE FROM roles WHERE id=?";
+    
+    // Membuat prepared statement
+    $stmt = $conn->prepare($sql);
+    
+    // Membind parameter ke prepared statement
     $stmt->bind_param("i", $id);
-
-    // Eksekusi statement
+    
+    // Mengeksekusi pernyataan
     if ($stmt->execute()) {
-        // Jika penghapusan berhasil, arahkan kembali ke halaman user-role.php
+        // Redirect ke halaman datauser.php setelah penghapusan berhasil
         header("Location: user-role.php");
-        exit;
     } else {
-        // Jika terjadi kesalahan, tampilkan pesan error
+        // Menampilkan pesan kesalahan jika terjadi masalah dalam penghapusan
         echo "Error deleting record: " . $stmt->error;
     }
-
-    // Tutup statement
+    
+    // Menutup prepared statement
     $stmt->close();
-} else {
-    // Jika ID tidak diberikan, tampilkan pesan error
-    echo "ID not provided";
 }
 
-// Tutup koneksi
+// Menutup koneksi database
 $conn->close();
 ?>

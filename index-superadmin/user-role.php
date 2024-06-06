@@ -2,6 +2,7 @@
 require_once '../db_connection.php';
 
 $sql = "SELECT id, role_name FROM roles";
+
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -36,10 +37,18 @@ if (!$result) {
 
     <!--Konfirmasi Delete -->
     <script>
-    function confirmDelete(id) {
-        if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-            window.location.href = 'delete-role.php?id=' + id;
-        }
+    function confirmDelete(id, event) {
+    // Prevent the default action of the link
+    event.preventDefault();
+
+    // Show the confirmation popup
+    var confirmation = confirm("Are you sure you want to delete this user?");
+
+    // If the user clicks "OK"
+    if (confirmation) {
+        // Redirect to the delete URL
+        window.location.href = "delete-role.php?id=" + id;
+    }
     }
     </script>
 
@@ -210,9 +219,9 @@ if (!$result) {
                                                     echo "<td>" . $row["id"]. "</td>";
                                                     echo "<td>" . $row["role_name"]. "</td>";
                                                     echo "<td>
-                                                    <a href='edit-role.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                    <a href='#' onclick='confirmDelete(event, " . $row["id"] . ")'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
-                                                        </td>";
+                                                            <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
+                                                            <a href='#' onclick='confirmDelete(" . $row["id"] . ", event)'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
+                                                            </td>";
                                                     echo "</tr>";
                                                 }
                                             } else {

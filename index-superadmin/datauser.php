@@ -36,6 +36,23 @@ if (!$result) {
     <!-- Custom styles for this page -->
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+    <!--Konfirmasi Delete -->
+    <script>
+    function confirmDelete(id, event) {
+    // Prevent the default action of the link
+    event.preventDefault();
+
+    // Show the confirmation popup
+    var confirmation = confirm("Are you sure you want to delete this user?");
+
+    // If the user clicks "OK"
+    if (confirmation) {
+        // Redirect to the delete URL
+        window.location.href = "delete-role.php?id=" + id;
+    }
+    }
+    </script>
+
 </head>
 
 <body id="page-top">
@@ -218,7 +235,7 @@ if (!$result) {
                                                     echo "<td>" . $row["role_name"]. "</td>";
                                                     echo "<td>
                                                             <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                            <a id='deleteBtn".$row["id"]."' href='delete-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-danger' onclick='confirmDelete(".$row["id"].")'><i class='far fa-trash-alt'></i></button></a>
+                                                            <a href='#' onclick='confirmDelete(" . $row["id"] . ", event)'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
                                                             </td>";
                                                     echo "</tr>";
                                                 }
@@ -295,19 +312,6 @@ if (!$result) {
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
-    
-    <script>
-    function confirmDelete(id) {
-        // Munculkan konfirmasi popup
-        var confirmation = confirm("Are you sure you want to delete this user?");
-
-        // Jika pengguna menekan OK
-        if (confirmation) {
-            // Ubah atribut href tombol "Delete" menjadi URL yang sesuai
-            document.getElementById("deleteBtn"+id).href = "delete-user.php?id=" + id;
-        }
-    }
-    </script>
 
 </body>
 
