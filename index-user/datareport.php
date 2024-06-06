@@ -1,4 +1,20 @@
+<?php
+session_start();
+echo "Peran Pengguna: ".$_SESSION['role'];
 
+// Misalnya, kita membuat fungsi bernama check_role()
+function check_role($required_role) {
+    // Cek apakah peran pengguna sesuai dengan peran yang diperlukan
+    if ($_SESSION['role'] !== $required_role) {
+        // Jika tidak sesuai, arahkan pengguna ke halaman akses ditolak
+        header("Location: ../access_denied.html");
+        exit();
+    }
+}
+
+// Periksa akses hanya untuk admin
+check_role('user');
+?>
 
 <!DOCTYPE html>
 <html lang="en">
