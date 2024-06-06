@@ -1,23 +1,27 @@
 <?php
-session_start();
+require_once '../db_connection.php';
 
-// Misalnya, kita membuat fungsi bernama check_role()
-function check_role($required_role) {
-    // Cek apakah peran pengguna sesuai dengan peran yang diperlukan
-    if ($_SESSION['role'] !== $required_role) {
-        // Jika tidak sesuai, arahkan pengguna ke halaman akses ditolak
-        header("Location: ../access_denied.html");
-        exit();
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    $id = $_GET["id"];
+    $sql = "SELECT id, role_name FROM roles WHERE id=$id";
+    $result = $conn->query($sql);
+    $user = $result->fetch_assoc();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $id = $_POST["id"];
+    $role_name = $_POST["role_name"];
+        
+    $sql = "UPDATE roles SET role_name='$role_name' WHERE id=$id";
+    
+    if ($conn->query($sql) === TRUE) {
+        header("Location: user-role.php");
+    } else {
+        echo "Error updating record: " . $conn->error;
     }
 }
 
-// Periksa akses hanya untuk admin
-check_role('admin');
-
-// Fetch the user's first and last names from the session
-$first_name = $_SESSION['first_name'];
-$last_name = $_SESSION['last_name'];
-
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -157,9 +161,9 @@ $last_name = $_SESSION['last_name'];
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome Back!!!</span>
-                                <img class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($first_name) . ' ' . htmlspecialchars($last_name); ?>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"

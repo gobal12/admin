@@ -18,6 +18,15 @@ check_role('admin');
 $first_name = $_SESSION['first_name'];
 $last_name = $_SESSION['last_name'];
 
+require_once '../db_connection.php';
+
+// Ambil data dari tabel roles
+$sql = "SELECT id, role_name FROM roles";
+$result = $conn->query($sql);
+
+if (!$result) {
+    die("Error executing query: " . $conn->error);
+}
 ?>
 
 
@@ -53,7 +62,7 @@ $last_name = $_SESSION['last_name'];
     event.preventDefault();
 
     // Show the confirmation popup
-    var confirmation = confirm("Are you sure you want to delete this user?");
+    var confirmation = confirm("Are you sure you want to delete this role?");
 
     // If the user clicks "OK"
     if (confirmation) {
@@ -175,9 +184,9 @@ $last_name = $_SESSION['last_name'];
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome Back!!</span>
-                                <img class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($first_name) . ' ' . htmlspecialchars($last_name); ?>
+                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -230,7 +239,7 @@ $last_name = $_SESSION['last_name'];
                                                     echo "<td>" . $row["id"]. "</td>";
                                                     echo "<td>" . $row["role_name"]. "</td>";
                                                     echo "<td>
-                                                            <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
+                                                            <a href='edit-role.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
                                                             <a href='#' onclick='confirmDelete(" . $row["id"] . ", event)'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
                                                             </td>";
                                                     echo "</tr>";
