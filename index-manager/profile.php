@@ -1,6 +1,5 @@
 <?php
 session_start();
-echo "Peran Pengguna: ".$_SESSION['role'];
 
 // Misalnya, kita membuat fungsi bernama check_role()
 function check_role($required_role) {
@@ -14,6 +13,11 @@ function check_role($required_role) {
 
 // Periksa akses hanya untuk admin
 check_role('manager');
+
+// Fetch the user's first and last names from the session
+$first_name = $_SESSION['first_name'];
+$last_name = $_SESSION['last_name'];
+
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +56,7 @@ check_role('manager');
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
                 <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
             </a>
 
@@ -90,7 +94,7 @@ check_role('manager');
                 <i class="fas fa-clipboard-list"></i>
                 <span>User</span></a>
             </li>
-
+    
             <!-- Nav Item - Profile -->
             <li class="nav-item">
                 <a class="nav-link" href="profile.php">
@@ -120,29 +124,14 @@ check_role('manager');
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
-                    <form class="form-inline">
-                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
-                        </button>
-                    </form>
 
                     <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
@@ -185,42 +174,33 @@ check_role('manager');
                         <div class="card-group">
                             <div class="card">
                                 <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <form>
-                                        <fieldset disabled>
-                                          <div class="form-group">
-                                            <label for="disabledTextInput">Email</label>
-                                            <input type="text" id="email" class="form-control" placeholder="Email" name="email">
-                                          </div>
-                                          <div class="form-group">
-                                            <label for="disabledTextInput">Password</label>
-                                            <input type="password" id="password" class="form-control" placeholder="Password" name="password">
-                                          </div>
-                                    </form>
-                                </div>
                             </div>
                             <div class="card">
                                 <div class="card-body">
                                   <h5 class="card-title">Data Diri</h5>
                                   <form>
-                                    <fieldset disabled>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">First Name</label>
-                                        <input type="text" id="firstname" class="form-control" placeholder="firstname" name="firstname">
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">Last Name</label>
-                                        <input type="text" id="lastname" class="form-control" placeholder="lastname" name="lastname">
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">Divisi</label>
-                                        <input type="text" id="divisi" class="form-control" placeholder="divisi" name="divisi">
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="disabledTextInput">Role</label>
-                                        <input type="text" id="role" class="form-control" placeholder="role" name="role">
-                                      </div>
-                                  </form>
+                                        <fieldset disabled>
+                                            <div class="form-group">
+                                                <label for="firstname">First Name</label>
+                                                <input type="text" id="firstname" class="form-control" placeholder="First Name" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="lastname">Last Name</label>
+                                                <input type="text" id="lastname" class="form-control" placeholder="Last Name" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input type="text" id="email" class="form-control" placeholder="Email" disabled>
+                                            </div>                                            
+                                            <div class="form-group">
+                                                <label for="divisi">Divisi</label>
+                                                <input type="text" id="divisi" class="form-control" placeholder="Divisi" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="disabledTextInput">Role</label>
+                                                <input type="text" id="role" class="form-control" placeholder="role" value="<?php echo htmlspecialchars($_SESSION['role']); ?>">
+                                            </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -236,7 +216,7 @@ check_role('manager');
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>
+                        <span>Copyright &copy; MI 2024</span>
                     </div>
                 </div>
             </footer>
@@ -289,6 +269,34 @@ check_role('manager');
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
+
+    <!--Ambil Data Profile-->
+    <script>
+    $(document).ready(function() {
+        // Fetch profile data via AJAX
+        $.ajax({
+            url: '../get_profile.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#email').val(response.data.email);
+                    $('#firstname').val(response.data.first_name);
+                    $('#lastname').val(response.data.last_name);
+                    $('#divisi').val(response.data.divisi);
+                } else {
+                    console.log(response.message);
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("AJAX Error: " + status + ": " + error);
+                alert('Failed to fetch profile data.');
+            }
+        });
+    });
+    </script>
+
 
 </body>
 
