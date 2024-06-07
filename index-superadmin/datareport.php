@@ -239,16 +239,6 @@ function export_to_excel($conn) {
                                         <?php
                                         // Filter date
                                         $where = [];
-                                        if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
-                                            $start_date = $_GET['start_date'];
-                                            $where[] = "tanggal_open >= '$start_date'";
-                                        }
-
-                                        if (isset($_GET['end_date']) && !empty($_GET['end_date'])) {
-                                            $end_date = $_GET['end_date'];
-                                            $where[] = "tanggal_close <= '$end_date'";
-                                        }
-
                                         if (isset($_GET['pelabuhan']) && !empty($_GET['pelabuhan'])) {
                                             $pelabuhan = $_GET['pelabuhan'];
                                             $where[] = "pelabuhan LIKE '%$pelabuhan%'";
@@ -303,7 +293,7 @@ function export_to_excel($conn) {
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>&copy; 2024 Your Company. All rights reserved.</span>
+                        <span>Copyright &copy; MI 2024</span>
                     </div>
                 </div>
             </footer>
