@@ -121,18 +121,14 @@ function export_to_excel($conn) {
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="form3.php">
-                    <i class="fab fa-wpforms"></i>
-                    <span>Form Report</span>
-                </a>
-            </li>
+
             <li class="nav-item">
                 <a class="nav-link" href="datareport.php">
                     <i class="fas fa-fw fa-table"></i>
                     <span>Data Report</span>
                 </a>
             </li>
+
             <hr class="sidebar-divider my-0">
             <li class="nav-item">
                 <a class="nav-link" href="datauser.php">

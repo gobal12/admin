@@ -81,13 +81,6 @@ if (!$result) {
                 <span>Dashboard</span></a>
             </li>
 
-            <!-- Nav Item - Form -->
-            <li class="nav-item">
-                <a class="nav-link" href="form3.php">
-                <i class="fab fa-wpforms"></i>
-                <span>Form Report</span></a>
-            </li>
-
             <!-- Nav Item - Data Report -->
             <li class="nav-item">
                     <a class="nav-link" href="datareport.php">
