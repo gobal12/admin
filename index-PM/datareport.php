@@ -15,7 +15,7 @@ function check_role($required_role) {
 }
 
 // Check access for admin
-check_role('project manager');
+check_role('manager');
 
 // Fetch the user's first and last names from the session
 $first_name = $_SESSION['first_name'];

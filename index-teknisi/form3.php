@@ -12,7 +12,7 @@ function check_role($required_role) {
 }
 
 // Periksa akses hanya untuk admin
-check_role('teknisi');
+check_role('user');
 
 // Fetch the user's first and last names from the session
 $first_name = $_SESSION['first_name'];

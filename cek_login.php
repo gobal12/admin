@@ -33,17 +33,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ob_end_clean();
 
                 switch ($row['role_name']) {
-                    case 'super admin':
+                    case 'admin':
                         header("Location: index-superadmin/charts.php");
                         break;
-                    case 'teknisi':
-                        header("Location: index-user/charts.php");
+                    case 'user':
+                        header("Location: index-teknisi/charts.php");
                         break;
-                    case 'project manager':
-                        header("Location: index-manager/charts.php");
+                    case 'manager':
+                        header("Location: index-pm/charts.php");
                         break;
                     case 'client':
-                        header("Location: index-manager/charts.php");
+                        header("Location: index-client/charts.php");
                         break;
                     default:
                         throw new Exception("Invalid role");
