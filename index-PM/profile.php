@@ -12,22 +12,12 @@ function check_role($required_role) {
 }
 
 // Periksa akses hanya untuk admin
-check_role('manager');
+check_role('project manager');
 
 // Fetch the user's first and last names from the session
 $first_name = $_SESSION['first_name'];
 $last_name = $_SESSION['last_name'];
 
-require_once '../db_connection.php';
-
-$sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.divisi, u.role_id, r.role_name
-        FROM users u 
-        INNER JOIN roles r ON u.role_id = r.id";
-$result = $conn->query($sql);
-
-if (!$result) {
-    die("Error executing query: " . $conn->error);
-}
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +31,7 @@ if (!$result) {
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Port Report Issues - Data User</title>
+    <title>Port Report Issues - Profile</title>
 
     <!-- Custom fonts for this template -->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -67,12 +57,11 @@ if (!$result) {
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
-                <div class="sidebar-brand-text mx-3">Port Report Issues</div>
+                <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
             </a>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
@@ -105,7 +94,7 @@ if (!$result) {
                 <i class="fas fa-clipboard-list"></i>
                 <span>User</span></a>
             </li>
-
+    
             <!-- Nav Item - Profile -->
             <li class="nav-item">
                 <a class="nav-link" href="profile.php">
@@ -176,46 +165,47 @@ if (!$result) {
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">User</h1>
-                    <p class="mb-4">Menampilkan list user yang telah terdaftar pada cms Port Report Issues</p>
+                    <!-- <h1 class="h3 mb-2 text-gray-800">Profile</h1> -->
 
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>id</th>
-                                            <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Divisi</th>
-                                            <th>Role</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                            if ($result->num_rows > 0) {
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo "<tr>";
-                                                    echo "<td>" . $row["id"]. "</td>";
-                                                    echo "<td>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
-                                                    echo "<td>" . $row["email"]. "</td>";
-                                                    echo "<td>" . $row["divisi"]. "</td>";
-                                                    echo "<td>" . $row["role_name"]. "</td>";
-                                                    echo "</tr>";
-                                                }
-                                            } else {
-                                                echo "<tr><td colspan='7'>No records found</td></tr>";
-                                            }
-                                        ?>
-                                    </tbody>
-                                </table>
+                    <div class="card">
+                        <div class="card-header" style="background-color: rgb(237, 237, 237);" >
+                         <b> Informasi Data Diri </b>
+                        </div>
+                        <div class="card-group">
+                            <div class="card">
+                                <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="card-img-top" alt="...">
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                  <h5 class="card-title">Data Diri</h5>
+                                  <form>
+                                        <fieldset disabled>
+                                            <div class="form-group">
+                                                <label for="firstname">First Name</label>
+                                                <input type="text" id="firstname" class="form-control" placeholder="First Name" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="lastname">Last Name</label>
+                                                <input type="text" id="lastname" class="form-control" placeholder="Last Name" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input type="text" id="email" class="form-control" placeholder="Email" disabled>
+                                            </div>                                            
+                                            <div class="form-group">
+                                                <label for="divisi">Divisi</label>
+                                                <input type="text" id="divisi" class="form-control" placeholder="Divisi" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="disabledTextInput">Role</label>
+                                                <input type="text" id="role" class="form-control" placeholder="role" value="<?php echo htmlspecialchars($_SESSION['role']); ?>">
+                                            </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                      </div>
+                    
                 </div>
                 <!-- /.container-fluid -->
 
@@ -279,6 +269,34 @@ if (!$result) {
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
+
+    <!--Ambil Data Profile-->
+    <script>
+    $(document).ready(function() {
+        // Fetch profile data via AJAX
+        $.ajax({
+            url: '../get_profile.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#email').val(response.data.email);
+                    $('#firstname').val(response.data.first_name);
+                    $('#lastname').val(response.data.last_name);
+                    $('#divisi').val(response.data.divisi);
+                } else {
+                    console.log(response.message);
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("AJAX Error: " + status + ": " + error);
+                alert('Failed to fetch profile data.');
+            }
+        });
+    });
+    </script>
+
 
 </body>
 

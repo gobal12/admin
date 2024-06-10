@@ -33,13 +33,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ob_end_clean();
 
                 switch ($row['role_name']) {
-                    case 'admin':
+                    case 'super admin':
                         header("Location: index-superadmin/charts.php");
                         break;
-                    case 'user':
+                    case 'teknisi':
                         header("Location: index-user/charts.php");
                         break;
-                    case 'manager':
+                    case 'project manager':
+                        header("Location: index-manager/charts.php");
+                        break;
+                    case 'client':
                         header("Location: index-manager/charts.php");
                         break;
                     default:
