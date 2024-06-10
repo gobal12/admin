@@ -30,8 +30,10 @@
                                     </form>
                                     <hr>
                                     <?php
-                                    if (isset($_GET['error'])) {
-                                        echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['error']) . '</div>';
+                                    session_start(); // Start session to access session variables
+                                    if (isset($_SESSION['error_message'])) {
+                                        echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
+                                        unset($_SESSION['error_message']); // Clear the error message after displaying it
                                     }
                                     ?>
                                 </div>

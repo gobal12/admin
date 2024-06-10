@@ -4,7 +4,6 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 ob_start();
-
 session_start();
 
 require_once 'db_connection.php';
@@ -56,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (Exception $e) {
         ob_end_clean(); // Clear buffer before redirect
         $_SESSION['error_message'] = $e->getMessage(); // Save error message
-        header("Location: index.php");
+        header("Location: index.php"); // Make sure to redirect to the login page
         exit();
     } finally {
         if (isset($conn) && $conn->connect_error == null) {
@@ -68,4 +67,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: index.php");
     exit();
 }
-?>
