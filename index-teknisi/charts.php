@@ -42,6 +42,9 @@ $last_name = $_SESSION['last_name'];
 
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <script src="../vendor/chart.js/Chart.min.js"></script>
+    
 
 </head>
 
@@ -54,7 +57,7 @@ $last_name = $_SESSION['last_name'];
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="form3.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
                 <div class="sidebar-brand-text mx-3">Port Report Issues</div>
             </a>
 
@@ -172,12 +175,15 @@ $last_name = $_SESSION['last_name'];
                                 <div class="card-body">
                                     <div class="chart-area">
                                         <canvas id="jenisPerangkatChart"></canvas>
+                                        
                                     </div>
-                                    <hr>
-                                    Styling for the area chart can be found in the
-                                    <code>/js/demo/chart-area-demo.js</code> file.
+                                    <hr> Menampilkan chart berdasarkan jenis perangkat
                                 </div>
                             </div>
+
+                            <script>
+                                
+                            </script>
 
                             <!-- Bar Chart -->
                             <div class="card shadow mb-4">
@@ -186,11 +192,10 @@ $last_name = $_SESSION['last_name'];
                                 </div>
                                 <div class="card-body">
                                     <div class="chart-bar">
-                                        <canvas id="myBarChart"></canvas>
+                                        <canvas id="lokasiPerangkat"></canvas>
+                                        
                                     </div>
-                                    <hr>
-                                    Styling for the bar chart can be found in the
-                                    <code>/js/demo/chart-bar-demo.js</code> file.
+                                    <hr> Menampilkan chart berdasarkan jenis lokasi perangkat
                                 </div>
                             </div>
 
@@ -206,11 +211,10 @@ $last_name = $_SESSION['last_name'];
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     <div class="chart-pie pt-4">
-                                        <canvas id="myPieChart"></canvas>
+                                        <canvas id="layananTerdampak"></canvas>
                                     </div>
                                     <hr>
-                                    Styling for the donut chart can be found in the
-                                    <code>/js/demo/chart-pie-demo.js</code> file.
+                                    Pie Chart Layanan Terdampak menampilkan data berdasarkan jenis-jenis layanan yang terdampak.
                                 </div>
                             </div>
                         </div>
@@ -276,83 +280,309 @@ $last_name = $_SESSION['last_name'];
     <!-- Page level plugins -->
     <script src="../vendor/chart.js/Chart.min.js"></script>
 
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/chart-area-demo.js"></script>
-    <script src="../js/demo/chart-pie-demo.js"></script>
-    <script src="../js/demo/chart-bar-demo.js"></script>
 
-
+    <!-- Buat Chart Jenis Perangkat -->
     <script>
-    fetch('getData.php')
-        .then(response => response.json())
-        .then(data => {
-            const jenisPerangkatData = {};
-            const lokasiPerangkatData = {};
-            const layananTerdampakData = {};
+        Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#858796';
 
-            data.forEach(item => {
-                // Jenis Perangkat
-                if (item.jenis_perangkat && item.jenis_perangkat !== 'null') {
-                    if (jenisPerangkatData[item.jenis_perangkat]) {
-                        jenisPerangkatData[item.jenis_perangkat]++;
-                    } else {
-                        jenisPerangkatData[item.jenis_perangkat] = 1;
-                    }
-                }
+        function number_format(number, decimals, dec_point, thousands_sep) {
+            number = (number + '').replace(',', '').replace(' ', '');
+            var n = !isFinite(+number) ? 0 : +number,
+                prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function(n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + Math.round(n * k) / k;
+                };
+            s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+            if (s[0].length > 3) {
+                s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+            }
+            if ((s[1] || '').length < prec) {
+                s[1] = s[1] || '';
+                s[1] += new Array(prec - s[1].length + 1).join('0');
+            }
+            return s.join(dec);
+        }
 
-                // Lokasi Perangkat
-                if (item.lokasi_perangkat && item.lokasi_perangkat !== 'null') {
-                    if (lokasiPerangkatData[item.lokasi_perangkat]) {
-                        lokasiPerangkatData[item.lokasi_perangkat]++;
-                    } else {
-                        lokasiPerangkatData[item.lokasi_perangkat] = 1;
-                    }
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../getData1.php')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.jenis_perangkat);
+                const counts = data.map(item => item.count);
 
-                // Layanan Terdampak
-                if (item.layanan_terdampak && item.layanan_terdampak !== 'null') {
-                    const layananArray = item.layanan_terdampak.split(',');
-                    layananArray.forEach(layanan => {
-                        if (layanan && layanan !== 'null') {
-                            if (layananTerdampakData[layanan]) {
-                                layananTerdampakData[layanan]++;
-                            } else {
-                                layananTerdampakData[layanan] = 1;
+                const ctx = document.getElementById('jenisPerangkatChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jumlah',
+                            lineTension: 0.3,
+                            backgroundColor: "rgba(78, 115, 223, 0.05)",
+                            borderColor: "rgba(78, 115, 223, 1)",
+                            pointRadius: 3,
+                            pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                            pointBorderColor: "rgba(78, 115, 223, 1)",
+                            pointHoverRadius: 3,
+                            pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                            pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                            pointHitRadius: 10,
+                            pointBorderWidth: 2,
+                            data: counts,
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 25,
+                                top: 25,
+                                bottom: 0
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                time: {
+                                    unit: 'date'
+                                },
+                                gridLines: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    maxTicksLimit: 7
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    maxTicksLimit: 5,
+                                    padding: 10,
+                                    callback: function(value, index, values) {
+                                        return number_format(value);
+                                    }
+                                },
+                                gridLines: {
+                                    color: "rgb(234, 236, 244)",
+                                    zeroLineColor: "rgb(234, 236, 244)",
+                                    drawBorder: false,
+                                    borderDash: [2],
+                                    zeroLineBorderDash: [2]
+                                }
+                            }],
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            backgroundColor: "rgb(255,255,255)",
+                            bodyFontColor: "#858796",
+                            titleMarginBottom: 10,
+                            titleFontColor: '#6e707e',
+                            titleFontSize: 14,
+                            borderColor: '#dddfeb',
+                            borderWidth: 1,
+                            xPadding: 15,
+                            yPadding: 15,
+                            displayColors: false,
+                            intersect: false,
+                            mode: 'index',
+                            caretPadding: 10,
+                            callbacks: {
+                                label: function(tooltipItem, chart) {
+                                    var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                                    return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
+                                }
                             }
                         }
-                    });
-                }
-            });
-
-            // Urutkan data berdasarkan kunci (0, 1, 2, 3, ...)
-            const sortData = (data) => {
-                const sortedKeys = Object.keys(data).sort((a, b) => a - b);
-                const sortedData = {};
-                sortedKeys.forEach(key => {
-                    sortedData[key] = data[key];
+                    }
                 });
-                return sortedData;
-            };
-
-            const sortedJenisPerangkatData = sortData(jenisPerangkatData);
-            const sortedLokasiPerangkatData = sortData(lokasiPerangkatData);
-            const sortedLayananTerdampakData = sortData(layananTerdampakData);
-
-            // Data untuk chart Jenis Perangkat
-            const jenisPerangkatLabels = Object.keys(sortedJenisPerangkatData);
-            const jenisPerangkatValues = Object.values(sortedJenisPerangkatData).map(value => parseInt(value));
-
-            // Data untuk chart Lokasi Perangkat
-            const lokasiPerangkatLabels = Object.keys(sortedLokasiPerangkatData);
-            const lokasiPerangkatValues = Object.values(sortedLokasiPerangkatData).map(value => parseInt(value));
-
-            // Data untuk chart Layanan Terdampak
-            const layananTerdampakLabels = Object.keys(sortedLayananTerdampakData);
-            const layananTerdampakValues = Object.values(sortedLayananTerdampakData).map(value => parseInt(value));
-
+            })
+            .catch(error => console.error('Error fetching the data:', error));
         });
-</script>
+    </script>
 
+
+    <!-- Buat chart Lokasi Perangkat -->
+    <script>
+             Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#858796';
+
+        function number_format(number, decimals, dec_point, thousands_sep) {
+            number = (number + '').replace(',', '').replace(' ', '');
+            var n = !isFinite(+number) ? 0 : +number,
+                prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function(n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + Math.round(n * k) / k;
+                };
+            s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+            if (s[0].length > 3) {
+                s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+            }
+            if ((s[1] || '').length < prec) {
+                s[1] = s[1] || '';
+                s[1] += new Array(prec - s[1].length + 1).join('0');
+            }
+            return s.join(dec);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../getData2.php')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.lokasi_perangkat);
+                const counts = data.map(item => item.count);
+
+                const ctx = document.getElementById('lokasiPerangkat').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jumlah',
+                            backgroundColor: "#4e73df",
+                            hoverBackgroundColor: "#2e59d9",
+                            borderColor: "#4e73df",
+                            data: counts,
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 25,
+                                top: 25,
+                                bottom: 0
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                time: {
+                                    unit: 'date'
+                                },
+                                gridLines: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    maxTicksLimit: 6
+                                },
+                                maxBarThickness: 25,
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    maxTicksLimit: 5,
+                                    padding: 10,
+                                    callback: function(value, index, values) {
+                                        return number_format(value);
+                                    }
+                                },
+                                gridLines: {
+                                    color: "rgb(234, 236, 244)",
+                                    zeroLineColor: "rgb(234, 236, 244)",
+                                    drawBorder: false,
+                                    borderDash: [2],
+                                    zeroLineBorderDash: [2]
+                                }
+                            }],
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            titleMarginBottom: 10,
+                            titleFontColor: '#6e707e',
+                            titleFontSize: 14,
+                            backgroundColor: "rgb(255,255,255)",
+                            bodyFontColor: "#858796",
+                            borderColor: '#dddfeb',
+                            borderWidth: 1,
+                            xPadding: 15,
+                            yPadding: 15,
+                            displayColors: false,
+                            caretPadding: 10,
+                            callbacks: {
+                                label: function(tooltipItem, chart) {
+                                    var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                                    return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching the data:', error));
+        });
+    </script>
+
+
+    <!-- Script Buat Pie Chart -->
+    <script>
+       fetch('../getData3.php')
+            .then(response => response.json())
+            .then(data => {
+                const layanan_terdampak = data.map(item => item.layanan_terdampak);
+
+                // Split and count occurrences
+                const layananCount = {};
+                layanan_terdampak.forEach(item => {
+                    item.split(',').forEach(service => {
+                        service = service.trim();
+                        if (layananCount[service]) {
+                            layananCount[service]++;
+                        } else {
+                            layananCount[service] = 1;
+                        }
+                    });
+                });
+
+                const labels = Object.keys(layananCount);
+                const countData = Object.values(layananCount);
+
+                // Create Chart.js doughnut chart
+                var ctx = document.getElementById("layananTerdampak");
+                var myPieChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: countData,
+                            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+                            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#f6b93e', '#e7393b'],
+                            hoverBorderColor: "rgba(234, 236, 244, 1)",
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        tooltips: {
+                            backgroundColor: "rgb(255,255,255)",
+                            bodyFontColor: "#858796",
+                            borderColor: '#dddfeb',
+                            borderWidth: 1,
+                            xPadding: 15,
+                            yPadding: 15,
+                            displayColors: false,
+                            caretPadding: 10,
+                        },
+                        legend: {
+                            display: false
+                        },
+                        cutoutPercentage: 80,
+                    },
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
     
     
 

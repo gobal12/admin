@@ -56,7 +56,7 @@ $last_name = $_SESSION['last_name'];
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
                 <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
             </a>
 
@@ -89,7 +89,7 @@ $last_name = $_SESSION['last_name'];
     
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="../profile.php">
+                <a class="nav-link" href="profile.php">
                 <i class="fas fa-user-alt"></i>
                 <span>Profile</span></a>
             </li>
@@ -116,29 +116,14 @@ $last_name = $_SESSION['last_name'];
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
-                    <form class="form-inline">
-                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
-                        </button>
-                    </form>
 
                     <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
@@ -223,7 +208,7 @@ $last_name = $_SESSION['last_name'];
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>
+                        <span>Copyright &copy; MI 2024</span>
                     </div>
                 </div>
             </footer>
@@ -282,7 +267,7 @@ $last_name = $_SESSION['last_name'];
     $(document).ready(function() {
         // Fetch profile data via AJAX
         $.ajax({
-            url: 'get_profile.php',
+            url: '../get_profile.php',
             type: 'GET',
             dataType: 'json',
             success: function(response) {
