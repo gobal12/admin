@@ -6,7 +6,7 @@ function check_role($required_role) {
     // Cek apakah peran pengguna sesuai dengan peran yang diperlukan
     if ($_SESSION['role'] !== $required_role) {
         // Jika tidak sesuai, arahkan pengguna ke halaman akses ditolak
-        header("Location: ../access_denied.html");
+        header("Location: ../access_denied.php");
         exit();
     }
 }

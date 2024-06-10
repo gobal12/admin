@@ -6,7 +6,7 @@ function check_role($required_role) {
     // Cek apakah peran pengguna sesuai dengan peran yang diperlukan
     if ($_SESSION['role'] !== $required_role) {
         // Jika tidak sesuai, arahkan pengguna ke halaman akses ditolak
-        header("Location: ../access_denied.html");
+        header("Location: ../access_denied.php");
         exit();
     }
 }
@@ -89,7 +89,7 @@ $last_name = $_SESSION['last_name'];
     
             <!-- Nav Item - Profile -->
             <li class="nav-item">
-                <a class="nav-link" href="profile.php">
+                <a class="nav-link" href="../profile.php">
                 <i class="fas fa-user-alt"></i>
                 <span>Profile</span></a>
             </li>

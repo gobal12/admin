@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // Function to check user role
 function check_role($required_role) {
     if ($_SESSION['role'] !== $required_role) {
-        header("Location: ../access_denied.html");
+        header("Location: ../access_denied.php");
         exit();
     }
 }
