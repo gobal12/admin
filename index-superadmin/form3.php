@@ -159,10 +159,6 @@ $last_name = $_SESSION['last_name'];
                                         <input type="datetime-local" class="form-control" id="waktuopentiket" name="waktuopentiket">
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="waktuclosetiket">Date Close Ticket</label>
-                                        <input type="datetime-local" class="form-control" id="waktuclosetiket" name="waktuclosetiket">
-                                    </div>
-                                    <div class="form-group col-md-6">
                                         <label for="jenisperangkat">Jenis Perangkat</label>
                                         <select id="jenisperangkat" name="jenisperangkat" class="form-control" onchange="loadLocations(this.value)">
                                             <option selected>Choose...</option>
@@ -299,7 +295,6 @@ $last_name = $_SESSION['last_name'];
         const data = {
             nomor_tiket: formData.get('inputnomortiket'),
             tanggal_open: formData.get('waktuopentiket'),
-            tanggal_close: formData.get('waktuclosetiket'),
             pelabuhan: formData.get('pelabuhan'),
             jenis_perangkat: selectedDeviceType,
             lokasi_perangkat: selectedLocation,
