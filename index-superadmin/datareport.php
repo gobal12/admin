@@ -153,17 +153,10 @@ function export_to_excel($conn) {
                     <span>Profile</span>
                 </a>
             </li>
-            <hr class="sidebar-divider">
-            <div class="sidebar-heading">
-                Addons
-            </div>
-            <li class="nav-item">
-                <a class="nav-link" href="../logout.php">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
             <hr class="sidebar-divider d-none d-md-block">
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
         </ul>
 
         <div id="content-wrapper" class="d-flex flex-column">
@@ -223,8 +216,6 @@ function export_to_excel($conn) {
                             </div>
                         </div>
                     </form>
-
-
 
                     <div class="table-responsive mt-4">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -334,6 +325,11 @@ function export_to_excel($conn) {
             </div>
         </div>
     </div>
+    <style>
+    .table-bordered{
+        font-size: 12px;
+    }
+    </style>
 
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
