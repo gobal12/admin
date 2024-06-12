@@ -299,7 +299,7 @@ function export_to_excel($conn) {
                                                                 })
                                                                 .then((willClose) => {
                                                                     if (willClose) {
-                                                                        window.location.href = '../update_status.php?id=' + id;
+                                                                        window.location.href = 'update_status.php?id=' + id;
                                                                     } else {
                                                                         swal('The ticket remains open.', {
                                                                             icon: 'info',
