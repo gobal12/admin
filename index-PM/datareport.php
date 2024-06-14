@@ -15,11 +15,29 @@ function check_role($required_role) {
 }
 
 // Check access for admin
-check_role('admin');
+check_role('manager');
 
 // Fetch the user's first and last names from the session
 $first_name = $_SESSION['first_name'];
 $last_name = $_SESSION['last_name'];
+
+// Get ticket ID from the request (assumption: ticket_id is passed as a query parameter)
+$ticket_id = isset($_GET['ticket_id']) ? intval($_GET['ticket_id']) : 0;
+
+// Fetch ticket status
+$status = '';
+if ($ticket_id > 0) {
+    $sql = "SELECT status FROM report WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $ticket_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $status = $result->fetch_assoc()['status'];
+}
+
+// Check if status is "close"
+$is_closed = ($status === 'close');
+
 
 if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     export_to_excel($conn);
@@ -262,6 +280,11 @@ function export_to_excel($conn) {
                                     $where[] = "DATE(tanggal_open) = '$tanggal_open'";
                                 }
 
+                                if (isset($_GET['status']) && !empty($_GET['status'])) {
+                                    $status = $_GET['status'];
+                                    $where[] = "status LIKE '%$status%'";
+                                }
+
                                 $where_clause = '';
                                 if (!empty($where)) {
                                     $where_clause = 'WHERE ' . implode(' AND ', $where);
@@ -271,51 +294,27 @@ function export_to_excel($conn) {
                                 $result = $conn->query($sql);
 
                                 if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
-                                        $tanggalOpen = new DateTime($row["tanggal_open"]);
-                                        $tanggalClose = new DateTime($row["tanggal_close"]);
-                                        $downtime = $tanggalOpen->diff($tanggalClose);
-                                        $downtimeMinutes = ($downtime->days * 24 * 60) + ($downtime->h * 60) + $downtime->i;
-
-                                        echo "<tr>
-                                                <td>" . $row["id_report"]. "</td>
-                                                <td>" . $row["pelabuhan"]. "</td>
-                                                <td>" . $row["nomor_tiket"]. "</td>
-                                                <td>" . $row["tanggal_open"]. "</td>
-                                                <td>" . $row["tanggal_close"]. "</td>
-                                                <td>" . $downtimeMinutes. "</td>
-                                                <td>" . $row["jenis_perangkat"]. "</td>
-                                                <td>" . $row["lokasi_perangkat"]. "</td>
-                                                <td>" . $row["layanan_terdampak"]. "</td>
-                                                <td>" . $row["keterangan"]. "</td>
-                                                <td>" . $row["status"]. "</td>
-                                                <td>";
-                                                if ($row["status"] !== 'Close') {
-                                                    echo "<button onclick='confirmClose(" . $row["id_report"] . ")' class='btn btn-danger btn-sm'>Close Ticket</button>";
-                                                    echo "<script>
-                                                            function confirmClose(id) {
-                                                                swal({
-                                                                    title: 'Apakah Anda Yakin?',
-                                                                    text: 'Setelah ditutup, anda tidak akan dapat membuka kembali tiket ini!',
-                                                                    icon: 'warning',
-                                                                    buttons: true,
-                                                                    dangerMode: true,
-                                                                })
-                                                                .then((willClose) => {
-                                                                    if (willClose) {
-                                                                        window.location.href = 'update_status.php?id=' + id;
-                                                                    } else {
-                                                                        swal('The ticket remains open.', {
-                                                                            icon: 'info',
-                                                                        });
-                                                                    }
-                                                                });
-                                                            }
-                                                        </script>";
-                                                }
-                                                
-                                        echo "</td>
-                                            </tr>";
+                                            while ($row = $result->fetch_assoc()) {
+                                                $tanggalOpen = new DateTime($row["tanggal_open"]);
+                                                $tanggalClose = new DateTime($row["tanggal_close"]);
+                                                $downtime = $tanggalOpen->diff($tanggalClose);
+                                                $downtimeMinutes = ($downtime->days * 24 * 60) + ($downtime->h * 60) + $downtime->i;
+                                                $ticketStatus = $row["status"];
+                                                $isTicketClosed = ($ticketStatus === 'close');
+                                                echo "<tr>";
+                                                echo "<td>{$row['id_report']}</td>";
+                                                echo "<td>{$row['pelabuhan']}</td>";
+                                                echo "<td>{$row['nomor_tiket']}</td>";
+                                                echo "<td>{$row['tanggal_open']}</td>";
+                                                echo "<td>{$row['tanggal_close']}</td>";
+                                                echo "<td>{$downtimeMinutes}</td>";
+                                                echo "<td>{$row['jenis_perangkat']}</td>";
+                                                echo "<td>{$row['lokasi_perangkat']}</td>";
+                                                echo "<td>{$row['layanan_terdampak']}</td>";
+                                                echo "<td>{$row['keterangan']}</td>";
+                                                echo "<td>{$row['status']}</td>";
+                                                echo "<td><button class='btn btn-primary' onclick='closeTicket({$row['id_report']})' " . ($isTicketClosed ? "disabled" : "") . ">Close Ticket</button></td>";
+                                                echo "</tr>";
                                     }
                                 } else {
                                     echo "<tr><td colspan='12'>No results found</td></tr>";
@@ -343,5 +342,12 @@ function export_to_excel($conn) {
     <script src="../js/demo/datatables-demo.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
+    <script>
+        function closeTicket(ticketId) {
+            if (confirm("Are you sure you want to close this ticket?")) {
+                window.location.href = 'update_status.php?ticket_id=' + ticketId;
+            }
+        }
+    </script>
 </body>
 </html>
