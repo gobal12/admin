@@ -108,43 +108,78 @@ function export_to_excel($conn) {
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body id="page-top">
     <div id="wrapper">
+        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
-                <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
+                <div class="sidebar-brand-text mx-3">Port Report Issues</div>
             </a>
+
+            <!-- Divider -->
             <hr class="sidebar-divider my-0">
+
+
+            <!-- Nav Item - Dashboard -->
             <li class="nav-item">
                 <a class="nav-link" href="charts.php">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Dashboard</span>
-                </a>
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard</span></a>
             </li>
+
+            <!-- Nav Item - Form -->
             <li class="nav-item">
                 <a class="nav-link" href="form3.php">
-                    <i class="fab fa-wpforms"></i>
-                    <span>Form Report</span>
-                </a>
+                <i class="fab fa-wpforms"></i>
+                <span>Form Report</span></a>
             </li>
+
+            <!-- Nav Item - Data Report -->
             <li class="nav-item">
-                <a class="nav-link" href="datareport.php">
+                    <a class="nav-link" href="datareport.php">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Data Report</span>
-                </a>
-            </li>
+                    <span>Data Report</span></a>
+             </li>
+
+            <!-- Divider -->
             <hr class="sidebar-divider my-0">
+
+
+            <!-- Nav Item - Profile -->
             <li class="nav-item">
                 <a class="nav-link" href="datauser.php">
-                    <i class="fas fa-fw fa-users"></i>
-                    <span>Data Users</span>
-                </a>
+                <i class="fas fa-clipboard-list"></i>
+                <span>User</span></a>
             </li>
+
+            <!-- Nav Item - Profile -->
+            <li class="nav-item">
+                <a class="nav-link" href="user-role.php">
+                <i class="fas fa-clipboard-list"></i>
+                <span>User Role</span></a>
+             </li>
+
+            <!-- Nav Item - Profile -->
+            <li class="nav-item">
+                <a class="nav-link" href="profile.php">
+                <i class="fas fa-user-alt"></i>
+                <span>Profile</span></a>
+            </li>
+
+
+            <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
+
         </ul>
 
         <div id="content-wrapper" class="d-flex flex-column">
@@ -306,12 +341,30 @@ function export_to_excel($conn) {
     <script src="../js/demo/datatables-demo.js"></script>
 
     <script>
+    function closeTicket(ticketId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, close it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'update_status.php?ticket_id=' + ticketId;
+            }
+        });
+    }
+    </script>
+
+    <!--<script>
         function closeTicket(ticketId) {
         if (confirm("Are you sure you want to close this ticket?")) {
             window.location.href = 'update_status.php?ticket_id=' + ticketId;
         }
         }
-    </script>
+    </script>-->
 
 </body>
 </html>
