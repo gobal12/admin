@@ -17,6 +17,20 @@ check_role('admin');
 // Fetch the user's first and last names from the session
 $first_name = $_SESSION['first_name'];
 $last_name = $_SESSION['last_name'];
+
+// Fetch roles from the database
+require_once '../db_connection.php';
+
+$query = "SELECT id, role_name FROM roles";
+$result = $conn->query($query);
+
+$roles = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $roles[] = $row;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -164,42 +178,52 @@ $last_name = $_SESSION['last_name'];
 
                 </nav>
                 <!-- End of Topbar -->
-                
+
                 <div class="container-fluid">
                     <h1 class="h3 mb-4 text-gray-800">Input User</h1>
                     <p class="mb-4"> Pastikan anda menginputkan data user dengan benar </p>
                     <div class="card">
                         <div class="card-body">
-                            <form class="user" action="register.php" method="post" onsubmit="return validateForm()">
+                            <form class="user" action="register.php" method="post" onsubmit="return validateForm(event)">
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label for="FirstName">Nama Depan</label>
                                         <input type="text" class="form-control form-control-user" id="FirstName" name="FirstName" placeholder="First Name">
                                     </div>
                                     <div class="col-sm-6">
+                                        <label for="LastName">Nama Belakang</label>
                                         <input type="text" class="form-control form-control-user" id="LastName" name="LastName" placeholder="Last Name">
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="Email">Email</label>
                                     <input type="email" class="form-control form-control-user" id="Email" name="Email" placeholder="Email Address">
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label for="Divisi">Divisi</label>
                                         <input type="text" class="form-control form-control-user" id="Divisi" name="Divisi" placeholder="Divisi">
                                     </div>
                                     <div class="col-sm-6">
-                                        <select class="form-control form-control-user" id="Role" name="Role">
+                                        <label for="Role">Role</label>
+                                        <select class="form-control form-control-user" id="Role" name="Role" onchange="highlightSelectedOption(this);">
                                             <option value="">Select Role</option>
-                                            <option value="admin">Admin</option>
-                                            <option value="user">User</option>
-                                            <option value="manager">Manager</option>
+                                            <?php
+                                            foreach ($roles as $role) {
+                                                $selected = ($_POST['Role'] ?? '') === $role['role_name'] ? 'selected' : '';
+                                                echo '<option value="' . htmlspecialchars($role['role_name']) . '" ' . $selected . '>' . htmlspecialchars($role['role_name']) . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label for="Password">Password</label>
                                         <input type="password" class="form-control form-control-user" id="Password" name="Password" placeholder="Password">
                                     </div>
                                     <div class="col-sm-6">
+                                        <label for="RepeatPassword">Ulangi Password</label>
                                         <input type="password" class="form-control form-control-user" id="RepeatPassword" name="RepeatPassword" placeholder="Repeat Password">
                                     </div>
                                 </div>
@@ -222,7 +246,7 @@ $last_name = $_SESSION['last_name'];
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
+    <!-- Logout Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -236,7 +260,7 @@ $last_name = $_SESSION['last_name'];
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../index.php">Logout</a>
+                    <a class="btn btn-primary" href="../logout.php">Logout</a>
                 </div>
             </div>
         </div>
@@ -258,88 +282,48 @@ $last_name = $_SESSION['last_name'];
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
-    
-    <!-- SweetAlert2 -->
+
+    <!-- SweetAlert library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         function validateForm(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            const firstName = document.getElementById('FirstName').value;
-            const lastName = document.getElementById('LastName').value;
-            const email = document.getElementById('Email').value;
-            const divisi = document.getElementById('Divisi').value;
+            event.preventDefault();
+            const firstName = document.getElementById('FirstName').value.trim();
+            const lastName = document.getElementById('LastName').value.trim();
+            const email = document.getElementById('Email').value.trim();
+            const divisi = document.getElementById('Divisi').value.trim();
             const role = document.getElementById('Role').value;
             const password = document.getElementById('Password').value;
             const repeatPassword = document.getElementById('RepeatPassword').value;
 
-            // Check if any field is empty
             if (!firstName || !lastName || !email || !divisi || !role || !password || !repeatPassword) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'All fields are required!',
+                    text: 'Please fill in all fields!',
                 });
-                return;
+                return false;
             }
 
-            // Check if passwords match
             if (password !== repeatPassword) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Passwords do not match!',
                 });
-                return;
+                return false;
             }
 
-            // If all validations pass, submit the form using AJAX
-            const formData = {
-                FirstName: firstName,
-                LastName: lastName,
-                Email: email,
-                Divisi: divisi,
-                Role: role,
-                Password: password,
-                RepeatPassword: repeatPassword
-            };
+            // If validation is successful, submit the form
+            event.target.submit();
+        }
 
-            fetch('register.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire(
-                        'Success',
-                        'User registered successfully',
-                        'success'
-                    ).then(() => {
-                        window.location.href = 'form3.php';
-                    });
-                } else {
-                    Swal.fire(
-                        'Failed',
-                        'Failed to register user: ' + (data.message || 'Unknown error'),
-                        'error'
-                    );
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                Swal.fire(
-                    'Error',
-                    'Failed to register user: ' + error.message,
-                    'error'
-                );
-            });
+        function highlightSelectedOption(selectElement) {
+            selectElement.style.color = selectElement.value ? 'black' : '#6e707e';
         }
     </script>
+
 </body>
 
 </html>

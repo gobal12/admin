@@ -199,9 +199,11 @@ $conn->close();
                         <div class="card-body">
                             <form class="role" method="post" action="edit-role.php">
                                 <div class="form-group">
+                                    <label for="id ">Id Role</label>
                                     <input type="text" class="form-control form-control-user" id="id" name="id" placeholder="id" value="<?php echo $user['id']; ?>">
                                 </div>
                                 <div class="form-group">
+                                    <label for="role_name">Nama Role</label>
                                     <input type="text" class="form-control form-control-user" id="role_name" name="role_name" placeholder="Role Name" value="<?php echo $user['role_name']; ?>">
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-user btn-block">

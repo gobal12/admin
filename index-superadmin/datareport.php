@@ -238,93 +238,107 @@ function export_to_excel($conn) {
                     </form>
 
                     <?php
-                    $where = [];
-                    if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
-                        $start_date = $_GET['start_date'];
-                        $where[] = "tanggal_open >= '$start_date'";
-                    }
-
-                    if (isset($_GET['end_date']) && !empty($_GET['end_date'])) {
-                        $end_date = $_GET['end_date'];
-                        $where[] = "tanggal_close <= '$end_date'";
-                    }
-
-                    if (isset($_GET['pelabuhan']) && !empty($_GET['pelabuhan'])) {
-                        $pelabuhan = $_GET['pelabuhan'];
-                        $where[] = "pelabuhan LIKE '%$pelabuhan%'";
-                    }
-
-                    if (isset($_GET['tanggal_open']) && !empty($_GET['tanggal_open'])) {
-                        $tanggal_open = $_GET['tanggal_open'];
-                        $where[] = "DATE(tanggal_open) = '$tanggal_open'";
-                    }
-
-                    $where_clause = '';
-                    if (!empty($where)) {
-                        $where_clause = 'WHERE ' . implode(' AND ', $where);
-                    }
-
-                    $sql = "SELECT * FROM report $where_clause";
-                    $result = $conn->query($sql);
-
-                    if ($result->num_rows > 0) {
-                        echo '<div class="table-responsive">';
-                        echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
-                        echo '<thead>';
-                        echo '<tr>';
-                        echo '<th>Nomor</th>';
-                        echo '<th>Nama Pelabuhan</th>';
-                        echo '<th>Nomor Tiket</th>';
-                        echo '<th>Tanggal Open</th>';
-                        echo '<th>Tanggal Close</th>';
-                        echo '<th>Downtime (Minutes)</th>';
-                        echo '<th>Jenis Perangkat</th>';
-                        echo '<th>Lokasi Perangkat</th>';
-                        echo '<th>Layanan Terdampak</th>';
-                        echo '<th>Keterangan</th>';
-                        echo '<th>Status</th>';
-                        echo '<th>Actions</th>';
-                        echo '</tr>';
-                        echo '</thead>';
-                        echo '<tbody>';
-
-                        while($row = $result->fetch_assoc()) {
-                            $tanggalOpen = new DateTime($row["tanggal_open"]);
-                            $tanggalClose = new DateTime($row["tanggal_close"]);
-                            $downtime = $tanggalOpen->diff($tanggalClose);
-                            $downtimeMinutes = ($downtime->days * 24 * 60) + ($downtime->h * 60) + $downtime->i;
-
-                            echo '<tr>';
-                            echo '<td>' . $row["id_report"] . '</td>';
-                            echo '<td>' . $row["pelabuhan"] . '</td>';
-                            echo '<td>' . $row["nomor_tiket"] . '</td>';
-                            echo '<td>' . $row["tanggal_open"] . '</td>';
-                            echo '<td>' . $row["tanggal_close"] . '</td>';
-                            echo '<td>' . $downtimeMinutes . '</td>';
-                            echo '<td>' . $row["jenis_perangkat"] . '</td>';
-                            echo '<td>' . $row["lokasi_perangkat"] . '</td>';
-                            echo '<td>' . $row["layanan_terdampak"] . '</td>';
-                            echo '<td>' . $row["keterangan"] . '</td>';
-                            echo '<td>' . $row["status"] . '</td>';
-                            echo '<td>';
-                            if ($row["status"] == 'open') {
-                                echo '<button class="btn btn-sm btn-danger" onclick="closeTicket(' . $row["id_report"] . ')">Close</button>';
-                            }
-                            echo '</td>';
-                            echo '</tr>';
+                        $where = [];
+                        if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
+                            $start_date = $_GET['start_date'];
+                            $where[] = "tanggal_open >= '$start_date'";
                         }
 
-                        echo '</tbody>';
-                        echo '</table>';
-                        echo '</div>';
-                    } else {
-                        echo '<p>No records found.</p>';
-                    }
+                        if (isset($_GET['end_date']) && !empty($_GET['end_date'])) {
+                            $end_date = $_GET['end_date'];
+                            $where[] = "tanggal_close <= '$end_date'";
+                        }
 
-                    $conn->close();
+                        if (isset($_GET['pelabuhan']) && !empty($_GET['pelabuhan'])) {
+                            $pelabuhan = $_GET['pelabuhan'];
+                            $where[] = "pelabuhan LIKE '%$pelabuhan%'";
+                        }
+
+                        if (isset($_GET['tanggal_open']) && !empty($_GET['tanggal_open'])) {
+                            $tanggal_open = $_GET['tanggal_open'];
+                            $where[] = "DATE(tanggal_open) = '$tanggal_open'";
+                        }
+
+                        $where_clause = '';
+                        if (!empty($where)) {
+                            $where_clause = 'WHERE ' . implode(' AND ', $where);
+                        }
+
+                        $sql = "SELECT * FROM report $where_clause";
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            echo '<div class="table-responsive">';
+                            echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
+                            echo '<thead>';
+                            echo '<tr>';
+                            echo '<th>Nomor</th>';
+                            echo '<th>Nama Pelabuhan</th>';
+                            echo '<th>Nomor Tiket</th>';
+                            echo '<th>Tanggal Open</th>';
+                            echo '<th>Tanggal Close</th>';
+                            echo '<th>Downtime (Minutes)</th>';
+                            echo '<th>Jenis Perangkat</th>';
+                            echo '<th>Lokasi Perangkat</th>';
+                            echo '<th>Layanan Terdampak</th>';
+                            echo '<th>Keterangan</th>';
+                            echo '<th>Status</th>';
+                            echo '<th>Actions</th>';
+                            echo '</tr>';
+                            echo '</thead>';
+                            echo '<tbody>';
+
+                            $nomor = 1; // variabel counter untuk nomor urut
+
+                            while ($row = $result->fetch_assoc()) {
+                                $tanggalOpen = new DateTime($row["tanggal_open"]);
+                                $tanggalClose = new DateTime($row["tanggal_close"]);
+                                $downtime = $tanggalOpen->diff($tanggalClose);
+                                $downtimeMinutes = ($downtime->days * 24 * 60) + ($downtime->h * 60) + $downtime->i;
+
+                                echo '<tr>';
+                                echo '<td>' . $nomor . '</td>'; // menampilkan nomor urut
+                                echo '<td>' . $row["pelabuhan"] . '</td>';
+                                echo '<td>' . $row["nomor_tiket"] . '</td>';
+                                echo '<td>' . $row["tanggal_open"] . '</td>';
+                                echo '<td>' . $row["tanggal_close"] . '</td>';
+                                echo '<td>' . $downtimeMinutes . '</td>';
+                                echo '<td>' . $row["jenis_perangkat"] . '</td>';
+                                echo '<td>' . $row["lokasi_perangkat"] . '</td>';
+                                echo '<td>' . $row["layanan_terdampak"] . '</td>';
+                                echo '<td>' . $row["keterangan"] . '</td>';
+                                echo '<td>' . $row["status"] . '</td>';
+                                echo '<td>';
+                                if ($row["status"] == 'open') {
+                                    echo '<button class="btn btn-sm btn-danger" onclick="closeTicket(' . $row["id_report"] . ')">Close</button>';
+                                }
+                                echo '</td>';
+                                echo '</tr>';
+
+                                $nomor++; // increment counter nomor urut
+                            }
+
+                            echo '</tbody>';
+                            echo '</table>';
+                            echo '</div>';
+                        } else {
+                            echo '<p>No records found.</p>';
+                        }
+
+                        $conn->close();
                     ?>
                 </div>
             </div>
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; MI 2024</span>
+                    </div>
+                </div>
+                </footer>
+                <!-- End of Footer -->
+
         </div>
     </div>
 
@@ -343,13 +357,13 @@ function export_to_excel($conn) {
     <script>
     function closeTicket(ticketId) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            title: 'Apakah kamu yakin?',
+            text: "Anda tidak akan dapat mengembalikan ini!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, close it!'
+            confirmButtonText: 'Yes'
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = 'update_status.php?ticket_id=' + ticketId;

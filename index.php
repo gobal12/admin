@@ -7,17 +7,19 @@
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 <body style="background-color:#EFEFEF;">
-    <div class="container">
+<div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-10 col-lg-12 col-md-9">
                 <div class="card o-hidden border-0 shadow-lg my-5">
                     <div class="card-body p-0">
                         <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                            <div class="col-lg-6">
+                                <img src="https://images.unsplash.com/photo-1542986386-660ccbbedaf8?q=80&w=1528&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Deskripsi Gambar" width="465" height="604">
+                            </div>
                             <div class="col-lg-6">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                        <h1 class="h4 text-gray-900 mb-4"><b>LOGIN</b></h1>
                                     </div>
                                     <form class="user" action="cek_login.php" method="post">
                                         <div class="form-group">

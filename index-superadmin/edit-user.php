@@ -203,19 +203,24 @@ $conn->close();
                         <div class="card-body">
                         <form class="user" method="post" action="edit-user.php">
                             <div class="form-group">
+                                <label for="first_name">Nama Depan</label>
                                 <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
                                 <input type="text" class="form-control form-control-user" id="first_name" name="first_name" placeholder="First Name" value="<?php echo $user['first_name']; ?>">
                             </div>
                             <div class="form-group">
+                                <label for="last_name">Nama Belakang</label>
                                 <input type="text" class="form-control form-control-user" id="last_name" name="last_name" placeholder="Last Name" value="<?php echo $user['last_name']; ?>">
                             </div>
                             <div class="form-group">
+                                <label for="email">Email</label>
                                 <input type="email" class="form-control form-control-user" id="email" name="email" placeholder="Email Address" value="<?php echo $user['email']; ?>">
                             </div>
                             <div class="form-group">
+                                <label for="divisi">Divisi</label>
                                 <input type="text" class="form-control form-control-user" id="divisi" name="divisi" placeholder="Divisi" value="<?php echo $user['divisi']; ?>">
                             </div>
                             <div class="form-group">
+                                <label for="role_id">ID Role</label>
                                 <input type="text" class="form-control form-control-user" id="role_id" name="role_id" placeholder="Role ID" value="<?php echo $user['role_id']; ?>">
                             </div>
                             <button type="submit" class="btn btn-primary btn-user btn-block">

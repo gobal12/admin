@@ -67,7 +67,7 @@ if (!$result) {
     // If the user clicks "OK"
     if (confirmation) {
         // Redirect to the delete URL
-        window.location.href = "delete-role.php?id=" + id;
+        window.location.href = "delete-user.php?id=" + id;
     }
     }
     </script>
@@ -212,39 +212,44 @@ if (!$result) {
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>id</th>
-                                            <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Divisi</th>
-                                            <th>Role</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                            if ($result->num_rows > 0) {
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo "<tr>";
-                                                    echo "<td>" . $row["id"]. "</td>";
-                                                    echo "<td>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
-                                                    echo "<td>" . $row["email"]. "</td>";
-                                                    echo "<td>" . $row["divisi"]. "</td>";
-                                                    echo "<td>" . $row["role_name"]. "</td>";
-                                                    echo "<td>
-                                                            <a href='edit-user.php?id=" . $row["id"] . "'><button type='button' class='btn btn-primary'><i class='fas fa-edit'></i></button></a>
-                                                            <a href='#' onclick='confirmDelete(" . $row["id"] . ", event)'><button type='button' class='btn btn-danger'><i class='far fa-trash-alt'></i></button></a>
-                                                            </td>";
-                                                    echo "</tr>";
-                                                }
-                                            } else {
-                                                echo "<tr><td colspan='7'>No records found</td></tr>";
-                                            }
-                                        ?>
-                                    </tbody>
-                                </table>
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Nomor</th>
+                                        <th>Nama</th>
+                                        <th>Email</th>
+                                        <th>Divisi</th>
+                                        <th>Role</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $nomor = 1; // variabel counter untuk nomor urut
+
+                                    if ($result->num_rows > 0) {
+                                        while($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $nomor . "</td>"; // menampilkan nomor urut
+                                            echo "<td>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
+                                            echo "<td>" . $row["email"] . "</td>";
+                                            echo "<td>" . $row["divisi"] . "</td>";
+                                            echo "<td>" . $row["role_name"] . "</td>";
+                                            echo "<td>";
+                                            echo "<a href='edit-user.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a>";
+                                            echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
+                                            echo "</td>";
+                                            echo "</tr>";
+                                            
+                                            $nomor++; // increment counter nomor urut
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='6'>No records found</td></tr>";
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+
                             </div>
                         </div>
                     </div>
