@@ -34,7 +34,6 @@ if (!$result) {
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -56,22 +55,7 @@ if (!$result) {
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
     <!--Konfirmasi Delete -->
-    <script>
-    function confirmDelete(id, event) {
-    // Prevent the default action of the link
-    event.preventDefault();
-
-    // Show the confirmation popup
-    var confirmation = confirm("Are you sure you want to delete this user?");
-
-    // If the user clicks "OK"
-    if (confirmation) {
-        // Redirect to the delete URL
-        window.location.href = "delete-user.php?id=" + id;
-    }
-    }
-    </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body id="page-top">
@@ -317,7 +301,30 @@ if (!$result) {
 
     <!-- Page level custom scripts -->
     <script src="../js/demo/datatables-demo.js"></script>
+    
+    <!-- Konfirmasi Delete -->
+    <script>
+    function confirmDelete(id, event) {
+        // Prevent the default action of the link
+        event.preventDefault();
 
+        // Show the SweetAlert confirmation popup
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to the delete URL
+                window.location.href = "delete-user.php?id=" + id;
+            }
+        });
+    }
+    </script>
 </body>
 
 </html>

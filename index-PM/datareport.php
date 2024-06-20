@@ -59,7 +59,7 @@ function export_to_excel($conn) {
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->setTitle('Report Data');
 
-    $header = ["Nomor", "Nama Pelabuhan", "Nomor Tiket", "Tanggal Open", "Tanggal Close", "Downtime (Minutes)", "Jenis Perangkat", "Lokasi Perangkat", "Layanan Terdampak", "Keterangan","Status"];
+    $header = ["Nomor", "Nama Pelabuhan", "Nomor Tiket", "Tanggal Open", "Tanggal Close", "Downtime (Minutes)", "Jenis Perangkat", "Lokasi Perangkat", "Layanan Terdampak", "Keterangan", "Status"];
     $sheet->fromArray($header, NULL, 'A1');
 
     if ($result->num_rows > 0) {
@@ -108,65 +108,84 @@ function export_to_excel($conn) {
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body id="page-top">
     <div id="wrapper">
+        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
-                <div class="sidebar-brand-text mx-3"> <b>Port Report Issues</b></div>
+                <div class="sidebar-brand-text mx-3">Port Report Issues</div>
             </a>
+
+            <!-- Divider -->
             <hr class="sidebar-divider my-0">
+
+
+            <!-- Nav Item - Dashboard -->
             <li class="nav-item">
                 <a class="nav-link" href="charts.php">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Dashboard</span>
-                </a>
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard</span></a>
             </li>
 
+            <!-- Nav Item - Data Report -->
             <li class="nav-item">
-                <a class="nav-link" href="datareport.php">
+                    <a class="nav-link" href="datareport.php">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Data Report</span>
-                </a>
-            </li>
+                    <span>Data Report</span></a>
+             </li>
 
-            <hr class="sidebar-divider my-0">
+             <!-- Nav Item - Profile -->
             <li class="nav-item">
                 <a class="nav-link" href="datauser.php">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>User</span>
-                </a>
+                <i class="fas fa-clipboard-list"></i>
+                <span>User</span></a>
             </li>
 
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Profile -->
             <li class="nav-item">
                 <a class="nav-link" href="profile.php">
-                    <i class="fas fa-user-alt"></i>
-                    <span>Profile</span>
-                </a>
+                <i class="fas fa-user-alt"></i>
+                <span>Profile</span></a>
             </li>
+
+
+            <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
+
         </ul>
 
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
                     <ul class="navbar-nav ml-auto">
-                        <div class="topbar-divider d-none d-sm-block"></div>
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?php echo htmlspecialchars($first_name) . ' ' . htmlspecialchars($last_name); ?>
-                                </span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo $first_name . ' ' . $last_name; ?></span>
                                 <img class="img-profile rounded-circle" src="../img/undraw_profile.svg">
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="profile.php">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
-                                </a>
+
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -178,8 +197,9 @@ function export_to_excel($conn) {
                 </nav>
 
                 <div class="container-fluid">
-                    <h1 class="h3 mb-2 text-gray-800">Data Report</h1>
-                    <p class="mb-4">Data Report menampilkan list report yang telah anda submit.</p>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Data Report</h1>
+                    </div>
 
                     <form method="GET" action="">
                         <div class="form-row align-items-center">
@@ -205,116 +225,127 @@ function export_to_excel($conn) {
                         </div>
                     </form>
 
+                    <?php
+                        $where = [];
+                        if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
+                            $start_date = $_GET['start_date'];
+                            $where[] = "tanggal_open >= '$start_date'";
+                        }
 
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Data Report</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Nomor</th>
-                                            <th>Nama Pelabuhan</th>
-                                            <th>Nomor Tiket</th>
-                                            <th>Tanggal Open</th>
-                                            <th>Tanggal Close</th>
-                                            <th>Downtime (Minutes)</th>
-                                            <th>Jenis Perangkat</th>
-                                            <th>Lokasi Perangkat</th>
-                                            <th>Layanan Terdampak</th>
-                                            <th>Keterangan</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        // Filter date
-                                        $where = [];
-                                        if (isset($_GET['pelabuhan']) && !empty($_GET['pelabuhan'])) {
-                                            $pelabuhan = $_GET['pelabuhan'];
-                                            $where[] = "pelabuhan LIKE '%$pelabuhan%'";
-                                        }
+                        if (isset($_GET['end_date']) && !empty($_GET['end_date'])) {
+                            $end_date = $_GET['end_date'];
+                            $where[] = "tanggal_close <= '$end_date'";
+                        }
 
-                                        if (isset($_GET['tanggal_open']) && !empty($_GET['tanggal_open'])) {
-                                            $tanggal_open = $_GET['tanggal_open'];
-                                            $where[] = "DATE(tanggal_open) = '$tanggal_open'";
-                                        }
+                        if (isset($_GET['pelabuhan']) && !empty($_GET['pelabuhan'])) {
+                            $pelabuhan = $_GET['pelabuhan'];
+                            $where[] = "pelabuhan LIKE '%$pelabuhan%'";
+                        }
 
-                                        $where_clause = '';
-                                        if (!empty($where)) {
-                                            $where_clause = 'WHERE ' . implode(' AND ', $where);
-                                        }
+                        if (isset($_GET['tanggal_open']) && !empty($_GET['tanggal_open'])) {
+                            $tanggal_open = $_GET['tanggal_open'];
+                            $where[] = "DATE(tanggal_open) = '$tanggal_open'";
+                        }
 
-                                        $sql = "SELECT * FROM report $where_clause";
-                                        $result = $conn->query($sql);
+                        $where_clause = '';
+                        if (!empty($where)) {
+                            $where_clause = 'WHERE ' . implode(' AND ', $where);
+                        }
 
-                                        if ($result->num_rows > 0) {
-                                            while($row = $result->fetch_assoc()) {
-                                                $tanggalOpen = new DateTime($row["tanggal_open"]);
-                                                $tanggalClose = new DateTime($row["tanggal_close"]);
-                                                $downtime = $tanggalOpen->diff($tanggalClose);
-                                                $downtimeMinutes = ($downtime->days * 24 * 60) + ($downtime->h * 60) + $downtime->i;
+                        $sql = "SELECT * FROM report $where_clause";
+                        $result = $conn->query($sql);
 
-                                                echo "<tr>
-                                                        <td>" . $row["id_report"]. "</td>
-                                                        <td>" . $row["pelabuhan"]. "</td>
-                                                        <td>" . $row["nomor_tiket"]. "</td>
-                                                        <td>" . $row["tanggal_open"]. "</td>
-                                                        <td>" . $row["tanggal_close"]. "</td>
-                                                        <td>" . $downtimeMinutes. "</td>
-                                                        <td>" . $row["jenis_perangkat"]. "</td>
-                                                        <td>" . $row["lokasi_perangkat"]. "</td>
-                                                        <td>" . $row["layanan_terdampak"]. "</td>
-                                                        <td>" . $row["keterangan"]. "</td>
-                                                        <td>" . $row["status"]. "</td>
-                                                    </tr>";
-                                            }
-                                        } else {
-                                            echo "<tr><td colspan='10'>No results found</td></tr>";
-                                        }
-                                        $conn->close();
-                                        ?>
-                                    </tbody>
-                                </table>
+                        if ($result->num_rows > 0) {
+                            echo '<div class="table-responsive">';
+                            echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
+                            echo '<thead>';
+                            echo '<tr>';
+                            echo '<th>Nomor</th>';
+                            echo '<th>Nama Pelabuhan</th>';
+                            echo '<th>Nomor Tiket</th>';
+                            echo '<th>Tanggal Open</th>';
+                            echo '<th>Tanggal Close</th>';
+                            echo '<th>Downtime (Minutes)</th>';
+                            echo '<th>Jenis Perangkat</th>';
+                            echo '<th>Lokasi Perangkat</th>';
+                            echo '<th>Layanan Terdampak</th>';
+                            echo '<th>Keterangan</th>';
+                            echo '<th>Status</th>';
+                            echo '</tr>';
+                            echo '</thead>';
+                            echo '<tbody>';
+
+                            $nomor = 1; // variabel counter untuk nomor urut
+
+                            while ($row = $result->fetch_assoc()) {
+                                $tanggalOpen = new DateTime($row["tanggal_open"]);
+                                $tanggalClose = new DateTime($row["tanggal_close"]);
+                                $downtime = $tanggalOpen->diff($tanggalClose);
+                                $downtimeMinutes = ($downtime->days * 24 * 60) + ($downtime->h * 60) + $downtime->i;
+
+                                echo '<tr>';
+                                echo '<td>' . $nomor . '</td>'; // menampilkan nomor urut
+                                echo '<td>' . $row["pelabuhan"] . '</td>';
+                                echo '<td>' . $row["nomor_tiket"] . '</td>';
+                                echo '<td>' . $row["tanggal_open"] . '</td>';
+                                echo '<td>' . $row["tanggal_close"] . '</td>';
+                                echo '<td>' . $downtimeMinutes . '</td>';
+                                echo '<td>' . $row["jenis_perangkat"] . '</td>';
+                                echo '<td>' . $row["lokasi_perangkat"] . '</td>';
+                                echo '<td>' . $row["layanan_terdampak"] . '</td>';
+                                echo '<td>' . $row["keterangan"] . '</td>';
+                                echo '<td>' . $row["status"] . '</td>';
+                                echo '</tr>';
+
+                                $nomor++; // increment counter nomor urut
+                            }
+
+                            echo '</tbody>';
+                            echo '</table>';
+                            echo '</div>';
+                        } else {
+                            echo '<p>No records found.</p>';
+                        }
+
+                        $conn->close();
+                    ?>
+                </div>
+            </div>
+                <!-- Logout Modal-->
+                <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                                <a class="btn btn-primary" href="../logout.php">Logout</a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <footer class="sticky-footer bg-white">
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
                         <span>Copyright &copy; MI 2024</span>
                     </div>
                 </div>
-            </footer>
+                </footer>
+                <!-- End of Footer -->
+
         </div>
     </div>
 
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
-
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../logout.php">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -323,5 +354,32 @@ function export_to_excel($conn) {
     <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script src="../js/demo/datatables-demo.js"></script>
+
+    <script>
+    function closeTicket(ticketId) {
+        Swal.fire({
+            title: 'Apakah kamu yakin?',
+            text: "Anda tidak akan dapat mengembalikan ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'update_status.php?ticket_id=' + ticketId;
+            }
+        });
+    }
+    </script>
+
+    <!--<script>
+        function closeTicket(ticketId) {
+        if (confirm("Are you sure you want to close this ticket?")) {
+            window.location.href = 'update_status.php?ticket_id=' + ticketId;
+        }
+        }
+    </script>-->
+
 </body>
 </html>
