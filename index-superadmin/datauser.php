@@ -310,13 +310,12 @@ if (!$result) {
 
         // Show the SweetAlert confirmation popup
         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            title: 'Apakah Kamu Yakin?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: 'Ya, Hapus Akun!'
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect to the delete URL
