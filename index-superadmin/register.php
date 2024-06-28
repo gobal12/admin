@@ -20,38 +20,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "INSERT INTO users (first_name, last_name, email, divisi, role_id, password) VALUES ('$firstName', '$lastName', '$email', '$divisi', '$roleId', '$hashedPassword')";
 
         if ($conn->query($sql) === TRUE) {
-            echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
             echo "<script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'New record created successfully'
-                    }).then(function() {
-                        window.location.href = 'datauser.php';
-                    });
+                    alert('New record created successfully');
+                    window.location.href = 'datauser.php';
                   </script>";
         } else {
-            echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
             echo "<script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error: " . $conn->error . "'
-                    }).then(function() {
-                        window.location.href = 'register.php';
-                    });
+                    alert('Error: " . $sql . "<br>" . $conn->error . "');
+                    window.location.href = 'register.php';
                   </script>";
         }
     } else {
-        echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
         echo "<script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid role',
-                    text: 'Invalid role selected'
-                }).then(function() {
-                    window.location.href = 'register.php';
-                });
+                alert('Invalid role selected');
+                window.location.href = 'register.php';
               </script>";
     }
 
