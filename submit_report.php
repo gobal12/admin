@@ -30,7 +30,7 @@ if (!$nomor_tiket || !$tanggal_open || !$pelabuhan || !$jenis_perangkat || !$lok
 // Simulate database connection
 // Replace these variables with your actual database connection settings
 $host = 'localhost';
-$db = 'dbport2';
+$db = 'portdb';
 $user = 'root';
 $pass = '';
 
