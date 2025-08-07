@@ -15,9 +15,9 @@ $logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
 
 include '../db_connection.php';
 
-// Ambil data jabatan & unit_project untuk select option
-$jabatan = $conn->query("SELECT id, name FROM jabatans");
-$unit = $conn->query("SELECT id, name FROM unit_projects");
+// // Ambil data jabatan & unit_project untuk select option
+// $jabatan = $conn->query("SELECT id, name FROM jabatans");
+// $unit = $conn->query("SELECT id, name FROM unit_projects");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Ambil data
