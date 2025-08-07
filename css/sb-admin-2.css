@@ -11281,3 +11281,21 @@ footer.sticky-footer .copyright {
 body.sidebar-toggled footer.sticky-footer {
   width: 100%;
 }
+
+    .sidebar .collapse-inner {
+        background-color: #4e73df !important;
+        color: white;
+    }
+
+    .sidebar .collapse-inner .collapse-item {
+        color: white !important;
+        background-color: transparent !important;
+        font-weight: normal;
+        transition: font-weight 0.2s ease-in-out;
+    }
+
+    .sidebar .collapse-inner .collapse-item:hover {
+        background-color: transparent !important;
+        font-weight: bold;
+        color: white !important;
+    }

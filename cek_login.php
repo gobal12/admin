@@ -16,49 +16,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Prevent SQL Injection
         $email = $conn->real_escape_string($email);
 
-        $sql = "SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.email='$email'";
+        // Tidak ada join dengan tabel 'roles'
+        $sql = "SELECT * FROM users WHERE email='$email'";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
+
             if (password_verify($password, $row['password'])) {
-                // Store data in session
+                // Store session data
                 $_SESSION['user_id'] = $row['id'];
-                $_SESSION['role'] = $row['role_name'];
-                $_SESSION['first_name'] = $row['first_name'];
-                $_SESSION['last_name'] = $row['last_name'];
+                $_SESSION['role'] = $row['role']; // langsung ambil dari kolom users.role
+                $_SESSION['name'] = $row['name'];
                 $_SESSION['loggedin'] = true;
 
-                // Clear buffer and redirect based on role_name
+                // Clear buffer and redirect based on role
                 ob_end_clean();
 
-                switch ($row['role_name']) {
+                switch ($row['role']) {
                     case 'admin':
-                        header("Location: index-superadmin/charts.php");
+                        header("Location: superadmin/charts.php");
                         break;
-                    case 'user':
-                        header("Location: index-teknisi/charts.php");
+                    case 'hrd':
+                        header("Location: hrd/charts.php");
                         break;
                     case 'manager':
-                        header("Location: index-pm/charts.php");
+                        header("Location: manager/charts.php");
                         break;
-                    case 'client':
-                        header("Location: index-client/charts.php");
+                    case 'karyawan':
+                        header("Location: karyawan/charts.php");
                         break;
                     default:
-                        throw new Exception("Invalid role");
+                        throw new Exception("Role tidak valid");
                 }
                 exit();
             } else {
-                throw new Exception("Invalid password");
+                throw new Exception("Password salah");
             }
         } else {
-            throw new Exception("No user found with that email address");
+            throw new Exception("Email tidak ditemukan");
         }
     } catch (Exception $e) {
         ob_end_clean(); // Clear buffer before redirect
-        $_SESSION['error_message'] = $e->getMessage(); // Save error message
-        header("Location: index.php"); // Make sure to redirect to the login page
+        $_SESSION['error_message'] = $e->getMessage(); // Simpan pesan error ke session
+        header("Location: index.php"); // Redirect kembali ke halaman login
         exit();
     } finally {
         if (isset($conn) && $conn->connect_error == null) {
@@ -66,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 } else {
-    // If not a POST request, redirect to the login page
+    // Bukan POST, redirect ke login
     header("Location: index.php");
     exit();
 }

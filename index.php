@@ -13,8 +13,8 @@
                 <div class="card o-hidden border-0 shadow-lg my-5">
                     <div class="card-body p-0">
                         <div class="row">
-                            <div class="col-lg-6">
-                                <img src="https://images.unsplash.com/photo-1542986386-660ccbbedaf8?q=80&w=1528&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Deskripsi Gambar" width="465" height="604">
+                            <div class="col-lg-6 d-flex justify-content-center align-items-center">
+                                <img src="https://nutech-integrasi.com/wp-content/uploads/2019/09/Logo-Nutech-ok.png" alt="Deskripsi Gambar">
                             </div>
                             <div class="col-lg-6">
                                 <div class="p-5">

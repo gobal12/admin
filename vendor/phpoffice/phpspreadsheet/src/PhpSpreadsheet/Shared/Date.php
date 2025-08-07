@@ -10,7 +10,6 @@ use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class Date
@@ -64,15 +63,15 @@ class Date
     /**
      * Set the Excel calendar (Windows 1900 or Mac 1904).
      *
-     * @param int $baseYear Excel base date (1900 or 1904)
+     * @param ?int $baseYear Excel base date (1900 or 1904)
      *
      * @return bool Success or failure
      */
-    public static function setExcelCalendar(int $baseYear): bool
+    public static function setExcelCalendar(?int $baseYear): bool
     {
         if (
-            ($baseYear == self::CALENDAR_WINDOWS_1900)
-            || ($baseYear == self::CALENDAR_MAC_1904)
+            ($baseYear === self::CALENDAR_WINDOWS_1900)
+            || ($baseYear === self::CALENDAR_MAC_1904)
         ) {
             self::$excelCalendar = $baseYear;
 
@@ -173,12 +172,12 @@ class Date
             throw new Exception("Invalid string $value supplied for datatype Date");
         }
 
-        $newValue = SharedDate::PHPToExcel($date);
+        $newValue = self::PHPToExcel($date);
         if ($newValue === false) {
             throw new Exception("Invalid string $value supplied for datatype Date");
         }
 
-        if (preg_match('/^\\s*\\d?\\d:\\d\\d(:\\d\\d([.]\\d+)?)?\\s*(am|pm)?\\s*$/i', $value) == 1) {
+        if (preg_match('/^\s*\d?\d:\d\d(:\d\d([.]\d+)?)?\s*(am|pm)?\s*$/i', $value) == 1) {
             $newValue = fmod($newValue, 1.0);
         }
 
@@ -215,6 +214,13 @@ class Date
             $baseDate = new DateTime('1899-12-30', $timeZone);
         }
 
+        if (is_int($excelTimestamp)) {
+            if ($excelTimestamp >= 0) {
+                return $baseDate->modify("+ $excelTimestamp days");
+            }
+
+            return $baseDate->modify("$excelTimestamp days");
+        }
         $days = floor($excelTimestamp);
         $partDay = $excelTimestamp - $days;
         $hms = 86400 * $partDay;
@@ -465,7 +471,7 @@ class Date
         if (strlen($dateValue) < 2) {
             return false;
         }
-        if (!preg_match('/^(\d{1,4}[ \.\/\-][A-Z]{3,9}([ \.\/\-]\d{1,4})?|[A-Z]{3,9}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?|\d{1,4}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?)( \d{1,2}:\d{1,2}(:\d{1,2})?)?$/iu', $dateValue)) {
+        if (!preg_match('/^(\d{1,4}[ \.\/\-][A-Z]{3,9}([ \.\/\-]\d{1,4})?|[A-Z]{3,9}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?|\d{1,4}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?)( \d{1,2}:\d{1,2}(:\d{1,2}([.]\d+)?)?)?$/iu', $dateValue)) {
             return false;
         }
 
@@ -538,11 +544,16 @@ class Date
         return $dtobj->format($format);
     }
 
+    /**
+     * Round the given DateTime object to seconds.
+     */
     public static function roundMicroseconds(DateTime $dti): void
     {
         $microseconds = (int) $dti->format('u');
-        if ($microseconds >= 500000) {
-            $dti->modify('+1 second');
+        $rounded = (int) round($microseconds, -6);
+        $modify = $rounded - $microseconds;
+        if ($modify !== 0) {
+            $dti->modify(($modify > 0 ? '+' : '') . $modify . ' microseconds');
         }
     }
 }

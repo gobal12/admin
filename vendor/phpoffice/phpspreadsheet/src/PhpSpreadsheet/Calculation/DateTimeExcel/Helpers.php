@@ -19,6 +19,8 @@ class Helpers
      */
     public static function isLeapYear(int|string $year): bool
     {
+        $year = (int) $year;
+
         return (($year % 4) === 0) && (($year % 100) !== 0) || (($year % 400) === 0);
     }
 
@@ -42,7 +44,9 @@ class Helpers
         if (!is_numeric($dateValue)) {
             $saveReturnDateType = Functions::getReturnDateType();
             Functions::setReturnDateType(Functions::RETURNDATE_EXCEL);
-            $dateValue = DateValue::fromString($dateValue);
+            if (is_string($dateValue)) {
+                $dateValue = DateValue::fromString($dateValue);
+            }
             Functions::setReturnDateType($saveReturnDateType);
             if (!is_numeric($dateValue)) {
                 throw new Exception(ExcelError::VALUE());
@@ -73,8 +77,10 @@ class Helpers
 
     /**
      * Adjust date by given months.
+     *
+     * @param float|int $dateValue date to be adjusted
      */
-    public static function adjustDateByMonths(mixed $dateValue = 0, float $adjustmentMonths = 0): DateTime
+    public static function adjustDateByMonths($dateValue = 0, float $adjustmentMonths = 0): DateTime
     {
         // Execute function
         $PHPDateObject = SharedDateHelper::excelToDateTimeObject($dateValue);
@@ -117,7 +123,7 @@ class Helpers
         if (!is_numeric($testVal1) || $testVal1 < 31) {
             if (!is_numeric($testVal2) || $testVal2 < 12) {
                 if (is_numeric($testVal3) && $testVal3 < 12) {
-                    $testVal3 += 2000;
+                    $testVal3 = (string) ($testVal3 + 2000);
                 }
             }
         }
@@ -125,6 +131,8 @@ class Helpers
 
     /**
      * Return result in one of three formats.
+     *
+     * @param array{year: int, month: int, day: int, hour: int, minute: int, second: int} $dateArray
      */
     public static function returnIn3FormatsArray(array $dateArray, bool $noFrac = false): DateTime|float|int
     {
@@ -262,11 +270,16 @@ class Helpers
         }
     }
 
+    /** @return array{year: int, month: int, day: int, hour: int, minute: int, second: int} */
     public static function dateParse(string $string): array
     {
-        return self::forceArray(date_parse($string));
+        /** @var array{year: int, month: int, day: int, hour: int, minute: int, second: int} */
+        $temp = self::forceArray(date_parse($string));
+
+        return $temp;
     }
 
+    /** @param mixed[] $dateArray */
     public static function dateParseSucceeded(array $dateArray): bool
     {
         return $dateArray['error_count'] === 0;
@@ -276,10 +289,19 @@ class Helpers
      * Despite documentation, date_parse probably never returns false.
      * Just in case, this routine helps guarantee it.
      *
-     * @param array|false $dateArray
+     * @param array<mixed>|false $dateArray
+     *
+     * @return mixed[]
      */
     private static function forceArray(array|bool $dateArray): array
     {
         return is_array($dateArray) ? $dateArray : ['error_count' => 1];
+    }
+
+    public static function floatOrInt(mixed $value): float|int
+    {
+        $result = Functions::scalar($value);
+
+        return is_numeric($result) ? ($result + 0) : 0;
     }
 }

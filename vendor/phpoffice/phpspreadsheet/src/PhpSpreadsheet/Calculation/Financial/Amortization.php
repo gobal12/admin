@@ -9,8 +9,6 @@ use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 
 class Amortization
 {
-    private const ROUNDING_ADJUSTMENT = (PHP_VERSION_ID < 80400) ? 0 : 1e-14;
-
     /**
      * AMORDEGRC.
      *
@@ -82,7 +80,7 @@ class Amortization
         $amortiseCoeff = self::getAmortizationCoefficient($rate);
 
         $rate *= $amortiseCoeff;
-        $rate += self::ROUNDING_ADJUSTMENT;
+        $rate = (float) (string) $rate; // ugly way to avoid rounding problem
         $fNRate = round($yearFrac * $rate * $cost, 0);
         $cost -= $fNRate;
         $fRest = $cost - $salvage;
@@ -173,9 +171,13 @@ class Amortization
         if (
             $basis == FinancialConstants::BASIS_DAYS_PER_YEAR_ACTUAL
             && $yearFrac < 1
-            && DateTimeExcel\Helpers::isLeapYear(Functions::scalar($purchasedYear))
         ) {
-            $yearFrac *= 365 / 366;
+            $temp = Functions::scalar($purchasedYear);
+            if (is_int($temp) || is_string($temp)) {
+                if (DateTimeExcel\Helpers::isLeapYear($temp)) {
+                    $yearFrac *= 365 / 366;
+                }
+            }
         }
 
         $f0Rate = $yearFrac * $rate * $cost;

@@ -12,6 +12,8 @@ class Matrix
 
     /**
      * Helper function; NOT an implementation of any Excel Function.
+     *
+     * @param mixed[] $values
      */
     public static function isColumnVector(array $values): bool
     {
@@ -20,6 +22,8 @@ class Matrix
 
     /**
      * Helper function; NOT an implementation of any Excel Function.
+     *
+     * @param mixed[] $values
      */
     public static function isRowVector(array $values): bool
     {
@@ -30,7 +34,9 @@ class Matrix
     /**
      * TRANSPOSE.
      *
-     * @param array|mixed $matrixData A matrix of values
+     * @param mixed $matrixData A matrix of values
+     *
+     * @return mixed[]
      */
     public static function transpose($matrixData): array
     {
@@ -38,8 +44,12 @@ class Matrix
         if (!is_array($matrixData)) {
             $matrixData = [[$matrixData]];
         }
+        if (!is_array(end($matrixData))) {
+            $matrixData = [$matrixData];
+        }
 
         $column = 0;
+        /** @var mixed[][] $matrixData */
         foreach ($matrixData as $matrixRow) {
             $row = 0;
             foreach ($matrixRow as $matrixCell) {
@@ -81,8 +91,16 @@ class Matrix
         }
 
         $rowNum = $rowNum ?? 0;
-        $originalColumnNum = $columnNum;
         $columnNum = $columnNum ?? 0;
+        if (is_scalar($matrix)) {
+            if ($rowNum === 0 || $rowNum === 1) {
+                if ($columnNum === 0 || $columnNum === 1) {
+                    if ($columnNum === 1 || $rowNum === 1) {
+                        return $matrix;
+                    }
+                }
+            }
+        }
 
         try {
             $rowNum = LookupRefValidations::validatePositiveInt($rowNum);
@@ -91,17 +109,25 @@ class Matrix
             return $e->getMessage();
         }
 
+        if (is_array($matrix) && count($matrix) === 1 && $rowNum > 1) {
+            $matrixKey = array_keys($matrix)[0];
+            if (is_array($matrix[$matrixKey])) {
+                $tempMatrix = [];
+                foreach ($matrix[$matrixKey] as $key => $value) {
+                    $tempMatrix[$key] = [$value];
+                }
+                $matrix = $tempMatrix;
+            }
+        }
+
         if (!is_array($matrix) || ($rowNum > count($matrix))) {
             return ExcelError::REF();
         }
 
         $rowKeys = array_keys($matrix);
-        $columnKeys = @array_keys($matrix[$rowKeys[0]]);
+        $columnKeys = @array_keys($matrix[$rowKeys[0]]); //* @phpstan-ignore-line
 
         if ($columnNum > count($columnKeys)) {
-            return ExcelError::REF();
-        }
-        if ($originalColumnNum === null && 1 < count($columnKeys)) {
             return ExcelError::REF();
         }
 
@@ -117,10 +143,15 @@ class Matrix
             );
         }
         $rowNum = $rowKeys[--$rowNum];
+        /** @var mixed[][] $matrix */
 
         return $matrix[$rowNum][$columnNum];
     }
 
+    /**
+     * @param mixed[] $matrix
+     * @param mixed[] $rowKeys
+     */
     private static function extractRowValue(array $matrix, array $rowKeys, int $rowNum): mixed
     {
         if ($rowNum === 0) {

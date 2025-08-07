@@ -33,6 +33,8 @@ class MemoryDrawing extends BaseDrawing
 
     /**
      * Rendering function.
+     *
+     * @var callable-string
      */
     private string $renderingFunction;
 
@@ -101,10 +103,8 @@ class MemoryDrawing extends BaseDrawing
             // If the image has transparency...
             $transparent = imagecolortransparent($this->imageResource);
             if ($transparent >= 0) {
+                // Starting with Php8.0, next function throws rather than return false
                 $rgb = imagecolorsforindex($this->imageResource, $transparent);
-                if (empty($rgb)) {
-                    throw new Exception('Could not get image colors');
-                }
 
                 imagesavealpha($clone, true);
                 $color = imagecolorallocatealpha($clone, $rgb['red'], $rgb['green'], $rgb['blue'], $rgb['alpha']);
@@ -163,6 +163,7 @@ class MemoryDrawing extends BaseDrawing
         return $drawing;
     }
 
+    /** @return callable-string */
     private static function identifyRenderingFunction(string $mimeType): string
     {
         return match ($mimeType) {
@@ -263,6 +264,8 @@ class MemoryDrawing extends BaseDrawing
 
     /**
      * Get rendering function.
+     *
+     * @return callable-string
      */
     public function getRenderingFunction(): string
     {
@@ -272,7 +275,7 @@ class MemoryDrawing extends BaseDrawing
     /**
      * Set rendering function.
      *
-     * @param string $value see self::RENDERING_*
+     * @param callable-string $value see self::RENDERING_*
      *
      * @return $this
      */

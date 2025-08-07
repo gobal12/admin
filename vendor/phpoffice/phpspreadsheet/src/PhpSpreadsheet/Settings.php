@@ -21,14 +21,7 @@ class Settings
     private static ?string $chartRenderer = null;
 
     /**
-     * Default options for libxml loader.
-     */
-    private static ?int $libXmlLoaderOptions = null;
-
-    /**
      * The cache implementation to be used for cell collection.
-     *
-     * @var ?CacheInterface
      */
     private static ?CacheInterface $cache = null;
 
@@ -64,7 +57,8 @@ class Settings
      */
     public static function setChartRenderer(string $rendererClassName): void
     {
-        if (!is_a($rendererClassName, IRenderer::class, true)) {
+        // We want phpstan to validate caller, but still need this test
+        if (!is_a($rendererClassName, IRenderer::class, true)) { //* @phpstan-ignore-line
             throw new Exception('Chart renderer must implement ' . IRenderer::class);
         }
 
@@ -90,36 +84,6 @@ class Settings
     public static function htmlEntityFlags(): int
     {
         return ENT_COMPAT;
-    }
-
-    /**
-     * Set default options for libxml loader.
-     *
-     * @param ?int $options Default options for libxml loader
-     */
-    public static function setLibXmlLoaderOptions(?int $options): int
-    {
-        if ($options === null) {
-            $options = defined('LIBXML_DTDLOAD') ? (LIBXML_DTDLOAD | LIBXML_DTDATTR) : 0;
-        }
-        self::$libXmlLoaderOptions = $options;
-
-        return $options;
-    }
-
-    /**
-     * Get default options for libxml loader.
-     * Defaults to LIBXML_DTDLOAD | LIBXML_DTDATTR when not set explicitly.
-     *
-     * @return int Default options for libxml loader
-     */
-    public static function getLibXmlLoaderOptions(): int
-    {
-        if (self::$libXmlLoaderOptions === null) {
-            return self::setLibXmlLoaderOptions(null);
-        }
-
-        return self::$libXmlLoaderOptions;
     }
 
     /**
