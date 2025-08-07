@@ -45,6 +45,6 @@ $stmt_delete_user->close();
 $conn->close();
 
 // Kembali ke halaman data karyawan
-header("Location: dataKaryawan.php?msg=deleted");
+header("Location: datakaryawan.php?msg=deleted");
 exit();
 ?>

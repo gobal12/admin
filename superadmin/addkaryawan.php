@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="date" class="form-control" name="hire_date" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="DataKaryawan.php" class="btn btn-secondary">Kembali</a>
+                        <a href="datakaryawan.php" class="btn btn-secondary">Kembali</a>
                     </form>
                 </div>
             <!-- End of Main Content -->
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     title: 'Berhasil',
                     text: 'Data karyawan berhasil ditambahkan.'
                 }).then(() => {
-                    window.location.href = 'DataKaryawan.php';
+                    window.location.href = 'datakaryawan.php';
                 });
             } else {
                 Swal.fire({

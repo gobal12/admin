@@ -18,16 +18,15 @@ require_once '../db_connection.php';
 
 // Query baru sesuai struktur database
 $sql = "SELECT 
-            k.id, 
-            u.name AS nama_user,
-            u.email, 
-            k.karyawan_id AS nik, 
-            j.name AS jabatan, 
-            up.name AS unit
-        FROM users u
-        INNER JOIN karyawans k ON u.id = k.user_id
-        INNER JOIN jabatans j ON k.jabatan_id = j.id
-        INNER JOIN unit_projects up ON k.unit_project_id = up.id";
+            f.id, 
+            f.nama AS faktor,
+            i.id,
+            i.faktor_id,
+            i.nama AS indikator, 
+            i.bobot AS bobot, 
+            i.target AS target
+        FROM faktor_kompetensi f
+        INNER JOIN indikator_kompetensi i ON f.id = i.faktor_id";
 
 $result = $conn->query($sql);
 
@@ -73,15 +72,14 @@ if (!$result) {
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data Karyawan</h1>
-                    <p class="mb-4">Menampilkan list Karyawan yang telah terdaftar pada CMS KPI Nutech Operation</p>
+                    <h1 class="h3 mb-2 text-gray-800">Data Faktor Kompetensi</h1>
+                    <p class="mb-4">Menampilkan list Faktor Kompetensi</p>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
     
                     <div class="card-header py-3">
-                        <a href="AddKaryawan.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Karyawan</a>
-                        <a href="addKaryawanExcel.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Import Excel</a>
+                        <a href="addkaryawan.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Faktor Kompetensi</a>
                     </div>
 
                         <div class="card-body">
@@ -90,11 +88,18 @@ if (!$result) {
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>NIK</th>
-                                        <th>Nama</th>
-                                        <th>Email</th>
-                                        <th>Unit / Project</th>
-                                        <th>Jabatan</th>
+                                        <th>Faktor Kompetensi</th>
+                                        <th>Indikator Kompetensi</th>
+                                        <th>
+                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Total bobot harus 100%">
+                                            Bobot (%)
+                                        </span>
+                                        </th>
+                                        <th>
+                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Total Target Max 4">
+                                            Target
+                                        </span>
+                                        </th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -105,13 +110,12 @@ if (!$result) {
                                         while($row = $result->fetch_assoc()) {
                                             echo "<tr>";
                                             echo "<td>" . $nomor . "</td>";
-                                            echo "<td>" . $row["nik"] . "</td>";
-                                            echo "<td>" . $row["nama_user"] . "</td>";
-                                            echo "<td>" . $row["email"] . "</td>";
-                                            echo "<td>" . $row["unit"] . "</td>";
-                                            echo "<td>" . $row["jabatan"] . "</td>";
+                                            echo "<td>" . $row["faktor"] . "</td>";
+                                            echo "<td>" . $row["indikator"] . "</td>";
+                                            echo "<td>" . $row["bobot"] . "</td>";
+                                            echo "<td>" . $row["target"] . "</td>";
                                             echo "<td>";
-                                            echo "<a href='EditKaryawan.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a> ";
+                                            echo "<a href='editkaryawan.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a> ";
                                             echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
                                             echo "</td>";
                                             echo "</tr>";
@@ -129,9 +133,9 @@ if (!$result) {
                     </div>
 
                 </div>
-                <!-- /.container-fluid -->
+
             <!-- Footer -->
-        <?php include 'layouts/footer.php'; ?>
+            <?php include 'layouts/footer.php'; ?>
 
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
@@ -172,6 +176,13 @@ if (!$result) {
         });
     }
     </script>
+
+<script>
+  // Untuk Bootstrap 5
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [...tooltipTriggerList].forEach(el => new bootstrap.Tooltip(el));
+</script>
+
 </body>
 
 </html>

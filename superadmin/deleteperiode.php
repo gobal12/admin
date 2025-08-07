@@ -24,7 +24,7 @@ try {
     $conn->commit();
 
     // Redirect kembali ke halaman data jabatan
-    header("Location: Dataperiode.php?message=success");
+    header("Location: dataperiode.php?message=success");
     exit();
 
 } catch (Exception $e) {

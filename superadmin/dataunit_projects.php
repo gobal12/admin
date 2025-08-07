@@ -18,15 +18,9 @@ require_once '../db_connection.php';
 
 // Query baru sesuai struktur database
 $sql = "SELECT 
-            f.id, 
-            f.nama AS faktor,
-            i.id,
-            i.faktor_id,
-            i.nama AS indikator, 
-            i.bobot AS bobot, 
-            i.target AS target
-        FROM faktor_kompetensi f
-        INNER JOIN indikator_kompetensi i ON f.id = i.faktor_id";
+            id,
+            name AS unit_project 
+        FROM unit_projects";
 
 $result = $conn->query($sql);
 
@@ -46,7 +40,7 @@ if (!$result) {
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>KPI Nutech Operation - Data Karyawan</title>
+    <title>KPI Nutech Operation - Data Unit/Projects</title>
 
     <!-- Custom fonts for this template -->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -72,14 +66,14 @@ if (!$result) {
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data Faktor Kompetensi</h1>
-                    <p class="mb-4">Menampilkan list Faktor Kompetensi</p>
+                    <h1 class="h3 mb-2 text-gray-800">Data Unit/Project</h1>
+                    <p class="mb-4">Menampilkan list Unit & Projects yang telah terdaftar pada CMS KPI Nutech Operation</p>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
     
                     <div class="card-header py-3">
-                        <a href="AddKaryawan.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Faktor Kompetensi</a>
+                        <a href="addunit_projects.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Unit/Project</a>
                     </div>
 
                         <div class="card-body">
@@ -87,44 +81,29 @@ if (!$result) {
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Faktor Kompetensi</th>
-                                        <th>Indikator Kompetensi</th>
-                                        <th>
-                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Total bobot harus 100%">
-                                            Bobot (%)
-                                        </span>
-                                        </th>
-                                        <th>
-                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Total Target Max 4">
-                                            Target
-                                        </span>
-                                        </th>
+                                        <th>Nomor</th>
+                                        <th>Unit / Project</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    $nomor = 1;
-                                    if ($result->num_rows > 0) {
-                                        while($row = $result->fetch_assoc()) {
-                                            echo "<tr>";
-                                            echo "<td>" . $nomor . "</td>";
-                                            echo "<td>" . $row["faktor"] . "</td>";
-                                            echo "<td>" . $row["indikator"] . "</td>";
-                                            echo "<td>" . $row["bobot"] . "</td>";
-                                            echo "<td>" . $row["target"] . "</td>";
-                                            echo "<td>";
-                                            echo "<a href='EditKaryawan.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a> ";
-                                            echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
-                                            echo "</td>";
-                                            echo "</tr>";
-                                            $nomor++;
-                                        }
-                                    } else {
-                                        echo "<tr><td colspan='7'>Data tidak ditemukan</td></tr>";
+                                <?php
+                                $nomor = 1;
+                                if ($result->num_rows > 0) {
+                                    while($row = $result->fetch_assoc()) {
+                                        echo "<tr>";
+                                        echo "<td>" . $nomor . "</td>";
+                                        echo "<td>" . $row["unit_project"] . "</td>";
+                                        echo "<td>";
+                                        echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
+                                        echo "</td>";
+                                        echo "</tr>";
+                                        $nomor++;
                                     }
-                                    ?>
+                                } else {
+                                    echo "<tr><td colspan='3'>Data tidak ditemukan</td></tr>";
+                                }
+                                ?>
                                 </tbody>
                             </table>
 
@@ -133,6 +112,7 @@ if (!$result) {
                     </div>
 
                 </div>
+                <!-- /.container-fluid -->
 
             <!-- Footer -->
             <?php include 'layouts/footer.php'; ?>
@@ -171,18 +151,11 @@ if (!$result) {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect to the delete URL
-                window.location.href = "deletekaryawan.php?id=" + id;
+                window.location.href = "deleteunit.php?id=" + id;
             }
         });
     }
     </script>
-
-<script>
-  // Untuk Bootstrap 5
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  [...tooltipTriggerList].forEach(el => new bootstrap.Tooltip(el));
-</script>
-
 </body>
 
 </html>

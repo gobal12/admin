@@ -73,7 +73,7 @@ if (!$result) {
                     <div class="card shadow mb-4">
     
                     <div class="card-header py-3">
-                        <a href="AddJabatan.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Jabatan</a>
+                        <a href="addjabatan.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Jabatan</a>
                     </div>
 
                         <div class="card-body">

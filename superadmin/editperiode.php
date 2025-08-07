@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     title: 'Berhasil',
                     text: 'Data periode berhasil diubah.'
                 }).then(() => {
-                    window.location.href = 'Periodepenilaian.php';
+                    window.location.href = 'periodepenilaian.php';
                 });
             } else {
                 Swal.fire({

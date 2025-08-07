@@ -18,9 +18,16 @@ require_once '../db_connection.php';
 
 // Query baru sesuai struktur database
 $sql = "SELECT 
-            id,
-            name AS unit_project 
-        FROM unit_projects";
+            k.id, 
+            u.name AS nama_user,
+            u.email, 
+            k.karyawan_id AS nik, 
+            j.name AS jabatan, 
+            up.name AS unit
+        FROM users u
+        INNER JOIN karyawans k ON u.id = k.user_id
+        INNER JOIN jabatans j ON k.jabatan_id = j.id
+        INNER JOIN unit_projects up ON k.unit_project_id = up.id";
 
 $result = $conn->query($sql);
 
@@ -40,7 +47,7 @@ if (!$result) {
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>KPI Nutech Operation - Data Unit/Projects</title>
+    <title>KPI Nutech Operation - Data Karyawan</title>
 
     <!-- Custom fonts for this template -->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -66,14 +73,15 @@ if (!$result) {
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data Unit/Project</h1>
-                    <p class="mb-4">Menampilkan list Unit & Projects yang telah terdaftar pada CMS KPI Nutech Operation</p>
+                    <h1 class="h3 mb-2 text-gray-800">Data Karyawan</h1>
+                    <p class="mb-4">Menampilkan list Karyawan yang telah terdaftar pada CMS KPI Nutech Operation</p>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
     
                     <div class="card-header py-3">
-                        <a href="AddUnit_Projects.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Unit/Project</a>
+                        <a href="addkaryawan.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Karyawan</a>
+                        <a href="addkaryawanexcel.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Import Excel</a>
                     </div>
 
                         <div class="card-body">
@@ -81,29 +89,38 @@ if (!$result) {
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Nomor</th>
+                                        <th>No</th>
+                                        <th>NIK</th>
+                                        <th>Nama</th>
+                                        <th>Email</th>
                                         <th>Unit / Project</th>
+                                        <th>Jabatan</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php
-                                $nomor = 1;
-                                if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
-                                        echo "<tr>";
-                                        echo "<td>" . $nomor . "</td>";
-                                        echo "<td>" . $row["unit_project"] . "</td>";
-                                        echo "<td>";
-                                        echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
-                                        echo "</td>";
-                                        echo "</tr>";
-                                        $nomor++;
+                                    <?php
+                                    $nomor = 1;
+                                    if ($result->num_rows > 0) {
+                                        while($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $nomor . "</td>";
+                                            echo "<td>" . $row["nik"] . "</td>";
+                                            echo "<td>" . $row["nama_user"] . "</td>";
+                                            echo "<td>" . $row["email"] . "</td>";
+                                            echo "<td>" . $row["unit"] . "</td>";
+                                            echo "<td>" . $row["jabatan"] . "</td>";
+                                            echo "<td>";
+                                            echo "<a href='editkaryawan.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a> ";
+                                            echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
+                                            echo "</td>";
+                                            echo "</tr>";
+                                            $nomor++;
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='7'>Data tidak ditemukan</td></tr>";
                                     }
-                                } else {
-                                    echo "<tr><td colspan='3'>Data tidak ditemukan</td></tr>";
-                                }
-                                ?>
+                                    ?>
                                 </tbody>
                             </table>
 
@@ -113,9 +130,8 @@ if (!$result) {
 
                 </div>
                 <!-- /.container-fluid -->
-
             <!-- Footer -->
-            <?php include 'layouts/footer.php'; ?>
+        <?php include 'layouts/footer.php'; ?>
 
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
@@ -151,7 +167,7 @@ if (!$result) {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect to the delete URL
-                window.location.href = "deleteunit.php?id=" + id;
+                window.location.href = "deletekaryawan.php?id=" + id;
             }
         });
     }

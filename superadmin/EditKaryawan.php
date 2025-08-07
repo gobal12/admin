@@ -219,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     title: 'Berhasil',
                     text: 'Data karyawan berhasil ditambahkan.'
                 }).then(() => {
-                    window.location.href = 'DataKaryawan.php';
+                    window.location.href = 'datakaryawan.php';
                 });
             } else {
                 Swal.fire({

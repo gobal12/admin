@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="email" class="form-control" name="email" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="DataKaryawan.php" class="btn btn-secondary">Kembali</a>
+                        <a href="datakaryawan.php" class="btn btn-secondary">Kembali</a>
                     </form>
                 </div>
 
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     title: 'Berhasil',
                     text: 'Data user berhasil ditambahkan.'
                 }).then(() => {
-                    window.location.href = 'addUser.php';
+                    window.location.href = 'adduser.php';
                 });
             } else {
                 Swal.fire({

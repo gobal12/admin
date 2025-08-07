@@ -99,7 +99,7 @@ document.getElementById("importForm").addEventListener("submit", function(e) {
                 icon: 'success',
                 confirmButtonText: 'OK'
             }).then(() => {
-                window.location.href = 'DataKaryawan.php';
+                window.location.href = 'datakaryawan.php';
             });
         } else {
             Swal.fire({

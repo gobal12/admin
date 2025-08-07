@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <input type="text" class="form-control" id="nama_unit" name="nama_unit" required>
                                 </div>
                                 <button type="submit" class="btn btn-success">Simpan</button>
-                                <a href="DataUnit_Projects.php" class="btn btn-secondary">Kembali</a>
+                                <a href="dataunit_projects.php" class="btn btn-secondary">Kembali</a>
                             </form>
                         </div>
                     </div>
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .then(data => {
                 if (data.success) {
                     Swal.fire('Berhasil', 'Jabatan berhasil ditambahkan', 'success')
-                        .then(() => window.location.href = 'DataJabatan.php');
+                        .then(() => window.location.href = 'dataunit_projects.php');
                 } else {
                     Swal.fire('Gagal', data.message || 'Terjadi kesalahan', 'error');
                 }

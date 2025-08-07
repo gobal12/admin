@@ -24,7 +24,7 @@ try {
     $conn->commit();
 
     // Redirect kembali ke halaman data jabatan
-    header("Location: DataUnit_Projects.php?message=success");
+    header("Location: dataunit_projects.php?message=success");
     exit();
 
 } catch (Exception $e) {
