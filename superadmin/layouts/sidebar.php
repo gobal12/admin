@@ -53,7 +53,7 @@
         </a>
         <div id="collapseKPI" class="collapse" data-parent="#accordionSidebar">
             <div class="py-2 collapse-inner rounded">
-                <a class="collapse-item" href="form-KPI.php">Form Input KPI</a>
+                <a class="collapse-item" href="form-kpi.php">Form Input KPI</a>
                 <a class="collapse-item" href="datakpi.php">Data KPI</a>
                 <a class="collapse-item" href="dataindikator.php">Data Faktor Kompetensi</a>
                 <a class="collapse-item" href="periodepenilaian.php">Data Periode</a>
