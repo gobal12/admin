@@ -66,9 +66,9 @@ $konsistensi = $res2->fetch_assoc();
 
                 <!-- Tombol ke form input -->
                 <div class="card-header py-3">
-                    <a href="ahp_input.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Update Perbandingan</a>
+                    <a href="ahp_input.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Update Perbandingan</a>           
+                    <a href="ahp.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Hitung Penilaian</a>
                 </div>
-
                 <div class="row">
                     <!-- Card Tabel Bobot -->
                     <div class="col-lg-8 mb-4">
