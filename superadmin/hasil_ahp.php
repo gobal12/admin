@@ -117,7 +117,7 @@ while ($row = $resPeriode->fetch_assoc()) {
                             JOIN users u ON u.id = k.user_id
                             JOIN periode_penilaian pp ON pp.id = pkahp.periode_id
                             WHERE pkahp.periode_id = ?
-                            ORDER BY u.name
+                            ORDER BY pkahp.total_nilai DESC, u.name
                         ";
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("i", $periode_id);
@@ -141,8 +141,9 @@ while ($row = $resPeriode->fetch_assoc()) {
                             JOIN karyawans k ON k.id = pkahp.karyawan_id
                             JOIN users u ON u.id = k.user_id
                             JOIN periode_penilaian pp ON pp.id = pkahp.periode_id
-                            ORDER BY pp.id DESC, u.name
+                            ORDER BY pkahp.total_nilai DESC, pp.id DESC, u.name
                         ";
+
                         $result = $conn->query($sql);
 
                         $detailSql = "SELECT penilaian_id, faktor_id, hasil FROM detail_penilaian_ahp";

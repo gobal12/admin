@@ -147,7 +147,7 @@
 
     <!-- KPI Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKPI">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKPI" title="KPI">
             <i class="fas fa-chart-bar"></i>
             <span>KPI</span>
         </a>
@@ -155,8 +155,6 @@
             <div class="py-2 collapse-inner rounded">
                 <a class="collapse-item" href="form-kpi.php">Form Input KPI</a>
                 <a class="collapse-item" href="datakpi.php">Data KPI</a>
-                <a class="collapse-item" href="ahp.php">Penghitungan AHP</a>
-                <a class="collapse-item" href="hasil_ahp.php">Hasil Penghitungan AHP</a>
                 <a class="collapse-item" href="dataindikator.php">Data Faktor Kompetensi</a>
                 <a class="collapse-item" href="periodepenilaian.php">Data Periode</a>
             </div>
@@ -165,21 +163,22 @@
 
         <!-- AHP Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKPI">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAHP" title="AHP">
             <i class="fas fa-chart-bar"></i>
-            <span>Penghitungan AHP</span>
+            <span>Perhitungan KPI Alternatif</span>
         </a>
-        <div id="collapseKPI" class="collapse" data-parent="#accordionSidebar">
+        <div id="collapseAHP" class="collapse" data-parent="#accordionSidebar">
             <div class="py-2 collapse-inner rounded">
-                <a class="collapse-item" href="ahp.php">Penghitungan AHP</a>
-                <a class="collapse-item" href="hasil_ahp.php">Hasil Penghitungan AHP</a>
+                <a class="collapse-item" href="ahp_input.php">Penghitungan Bobot</a>
+                <a class="collapse-item" href="ahp.php">Menghitung Hasil</a>
+                <a class="collapse-item" href="hasil_ahp.php">Hasil Penghitungan</a>
             </div>
         </div>
     </li>
 
     <!-- Data Master -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseData">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseData" title="Manajemen Data">
             <i class="fas fa-database"></i>
             <span>Manajemen Data</span>
         </a>

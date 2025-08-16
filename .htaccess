@@ -1,0 +1,12 @@
+# Matikan list folder
+Options -Indexes
+
+# Cegah akses langsung kecuali lewat file PHP utama
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Kalau tidak ada session login, redirect ke login
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ /login.php [L,R=302]
+</IfModule>

@@ -59,12 +59,35 @@ $n = count($faktor);
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                         <h3>Input Perbandingan Faktor AHP</h3>
-                        <p class="text-muted">
-                            Isi nilai perbandingan antar faktor sesuai kepentingannya.<br />
-                            1 = sama penting, 3 = sedikit lebih penting, 5 = lebih penting, 7 = sangat penting, 9 = mutlak lebih penting.<br />
-                            Gunakan nilai desimal atau kebalikan (misal 0.3333) untuk menyatakan sebaliknya.
-                        </p>
-
+<div class="alert alert-info">
+    <strong>Panduan Pengisian:</strong>
+    <ul class="mb-0">
+        <li>Isi angka <strong>di atas diagonal</strong> (sebelah kanan dari 1), sistem akan otomatis menghitung kebalikannya di bawah diagonal.</li>
+        <li>Gunakan skala <strong>1 – 9</strong> untuk menilai tingkat kepentingan:
+            <ul>
+                <li>1 = Sama penting</li>
+                <li>3 = Sedikit lebih penting</li>
+                <li>5 = Lebih penting</li>
+                <li>7 = Sangat lebih penting</li>
+                <li>9 = Mutlak lebih penting</li>
+                <li>Gunakan nilai desimal atau pecahan jika di antara skala (misal: 1.5 atau 0.5 untuk kebalikannya).</li>
+            </ul>
+        </li>
+        <li>
+            Contoh: Jika 
+            <strong><?php echo htmlspecialchars($faktor[0]); ?></strong> 
+            lebih penting <strong>3 kali</strong> dibanding 
+            <strong><?php echo htmlspecialchars($faktor[1]); ?></strong>, 
+            maka isi angka <strong>3</strong> pada baris 
+            <strong><?php echo htmlspecialchars($faktor[0]); ?></strong> kolom 
+            <strong><?php echo htmlspecialchars($faktor[1]); ?></strong>. 
+            Sistem akan otomatis mengisi <strong>0.333</strong> pada baris 
+            <strong><?php echo htmlspecialchars($faktor[1]); ?></strong> kolom 
+            <strong><?php echo htmlspecialchars($faktor[0]); ?></strong>.
+        </li>
+        <li>Kolom diagonal (nilai perbandingan dengan dirinya sendiri) selalu <strong>1</strong>.</li>
+    </ul>
+</div>
                         <form method="post" action="ahp_process.php" id="ahpForm">
                             <table class="table table-bordered">
                                 <thead>
