@@ -1,6 +1,19 @@
 <?php
 session_start();
 
+//Cek role user
+function check_role($required_role) {
+    if ($_SESSION['role'] !== $required_role) {
+        header("Location: ../access_denied.php");
+        exit();
+    }
+}
+
+check_role('admin');
+
+$logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
+
+include '../db_connection.php';
 ?>
 
 <!DOCTYPE html>

@@ -1,9 +1,10 @@
 <?php
 session_start();
-require '../vendor/autoload.php'; // Composer autoload untuk PhpSpreadsheet
+require '../vendor/autoload.php'; 
 include '../db_connection.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 header('Content-Type: application/json');
 
@@ -18,14 +19,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file_excel'])) {
         $conn->begin_transaction();
 
         foreach ($rows as $index => $row) {
-            if ($index === 0) continue; // Lewati header baris pertama
+            if ($index === 0) continue; // skip header
 
             list($nama, $email, $karyawan_id, $jabatan_id, $unit_id, $hire_date) = $row;
 
-            // Validasi minimal
             if (empty($nama) || empty($email) || empty($karyawan_id)) {
                 throw new Exception("Data tidak lengkap di baris ke-" . ($index + 1));
             }
+
+            // convert date jika format excel serial number
+            if (is_numeric($hire_date)) {
+                $hire_date = Date::excelToDateTimeObject($hire_date)->format('Y-m-d');
+            }
+
+            // cek duplikasi email
+            $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $check->bind_param("s", $email);
+            $check->execute();
+            $check->store_result();
+            if ($check->num_rows > 0) {
+                throw new Exception("Email '$email' sudah ada di baris " . ($index + 1));
+            }
+            $check->close();
 
             $password = password_hash('Nutech123', PASSWORD_DEFAULT);
             $role = 'karyawan';

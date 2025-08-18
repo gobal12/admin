@@ -165,11 +165,11 @@
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAHP" title="AHP">
             <i class="fas fa-chart-bar"></i>
-            <span>Perhitungan KPI Alternatif</span>
+            <span>KPI Alternatif</span>
         </a>
         <div id="collapseAHP" class="collapse" data-parent="#accordionSidebar">
             <div class="py-2 collapse-inner rounded">
-                <a class="collapse-item" href="ahp_input.php">Penghitungan Bobot</a>
+                <a class="collapse-item" href="ahp_result.php">Penghitungan Bobot</a>
                 <a class="collapse-item" href="ahp.php">Menghitung Hasil</a>
                 <a class="collapse-item" href="hasil_ahp.php">Hasil Penghitungan</a>
             </div>
