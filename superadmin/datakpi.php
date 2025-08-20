@@ -12,12 +12,15 @@ function check_role($required_role) {
 check_role('admin');
 
 // Ambil nama user dari session
-$logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
+$logged_in_user = $_SESSION['name'] ?? 'Guest';
 
 require_once '../db_connection.php';
 
+// ==== Ambil filter dari GET ====
+$periode_id = isset($_GET['periode_id']) ? (int) $_GET['periode_id'] : 0;
+$unit_id    = isset($_GET['unit_id']) ? (int) $_GET['unit_id'] : 0;
+
 // Query untuk ambil data penilaian_kpi + join karyawan dan periode
-// Bangun query dasar
 $sql = "SELECT 
             pk.id, 
             k.id AS karyawan_id, 
@@ -34,13 +37,11 @@ $sql = "SELECT
 
 // ====== Tambahkan Filter jika ada ======
 $where = [];
-if (!empty($_GET['periode'])) {
-    $periode = intval($_GET['periode']);
-    $where[] = "pp.id = $periode";
+if ($periode_id > 0) {
+    $where[] = "pp.id = $periode_id";
 }
-if (!empty($_GET['unit'])) {
-    $unit = intval($_GET['unit']);
-    $where[] = "up.id = $unit";
+if ($unit_id > 0) {
+    $where[] = "up.id = $unit_id";
 }
 
 if (count($where) > 0) {
@@ -51,8 +52,10 @@ $sql .= " ORDER BY pk.tanggal_input DESC";
 
 $result = $conn->query($sql);
 
+// Ambil daftar periode dan unit buat dropdown
+$periodeList = $conn->query("SELECT id, nama_periode FROM periode_penilaian ORDER BY id DESC")->fetch_all(MYSQLI_ASSOC);
+$unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -96,45 +99,43 @@ $result = $conn->query($sql);
                     <!-- DataTales Example --><div class="card shadow mb-4">   
                     <div class="card-body">
                         <div class="table-responsive">
-                            <!-- Form Filter + Tombol Cetak -->
-                            <form method="GET" class="form-inline mb-3 w-100">
-                                <!-- Filter Periode -->
-                                <label class="mr-2">Periode:</label>
-                                <select name="periode" class="form-control mr-3">
-                                    <option value="">-- Semua Periode --</option>
-                                    <?php 
-                                    $periodeQuery = $conn->query("SELECT id, nama_periode FROM periode_penilaian");
-                                    while($p = $periodeQuery->fetch_assoc()): 
-                                        $selected = (isset($_GET['periode']) && $_GET['periode'] == $p['id']) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $p['id'] ?>" <?= $selected ?>><?= $p['nama_periode'] ?></option>
-                                    <?php endwhile; ?>
-                                </select>
+                    <!-- Form Filter + Tombol Cetak -->
+                    <form method="GET" class="mb-3 row">
+                        <!-- Filter Periode -->
+                        <div class="col-md-4">
+                            <label for="periode_id">Filter Periode:</label>
+                            <select name="periode_id" id="periode_id" class="form-control" onchange="this.form.submit()">
+                                <option value="0" <?= $periode_id === 0 ? 'selected' : '' ?>>-- Semua Periode --</option>
+                                <?php foreach ($periodeList as $p): ?>
+                                    <option value="<?= $p['id'] ?>" <?= $periode_id === (int)$p['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($p['nama_periode']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                                <!-- Filter Unit/Project -->
-                                <label class="mr-2">Unit/Project:</label>
-                                <select name="unit" class="form-control mr-3">
-                                    <option value="">-- Semua Unit --</option>
-                                    <?php 
-                                    $unitQuery = $conn->query("SELECT id, name FROM unit_projects");
-                                    while($u = $unitQuery->fetch_assoc()): 
-                                        $selected = (isset($_GET['unit']) && $_GET['unit'] == $u['id']) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $u['id'] ?>" <?= $selected ?>><?= $u['name'] ?></option>
-                                    <?php endwhile; ?>
-                                </select>
+                        <!-- Filter Unit -->
+                        <div class="col-md-4">
+                            <label for="unit_id">Filter Unit / Project:</label>
+                            <select name="unit_id" id="unit_id" class="form-control" onchange="this.form.submit()">
+                                <option value="0" <?= $unit_id === 0 ? 'selected' : '' ?>>-- Semua Unit / Project --</option>
+                                <?php foreach ($unitList as $u): ?>
+                                    <option value="<?= $u['id'] ?>" <?= $unit_id === (int)$u['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($u['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                                <button type="submit" class="btn btn-primary">Filter</button>
-                                <a href="data_kpi.php" class="btn btn-secondary ml-2">Reset</a>
-
-                                <!-- Tombol Cetak Semua di kanan -->
-                                <a href="cetak_all_kpi.php?periode=<?= urlencode($_GET['periode'] ?? '') ?>&unit=<?= urlencode($_GET['unit'] ?? '') ?>" 
-                                target="_blank" 
-                                class="btn btn-success ml-auto">
-                                    <i class="fas fa-print"></i> Cetak Semua
-                                </a>
-                            </form>
-
+                        <!-- Tombol Cetak Semua -->
+                        <div class="col-md-4 d-flex align-items-end">
+                            <a href="cetak_all_kpi.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
+                            target="_blank" 
+                            class="btn btn-success ml-auto">
+                                <i class="fas fa-print"></i> Cetak Semua
+                            </a>
+                        </div>
+                    </form>
                             <!-- Tabel Data -->
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>

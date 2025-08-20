@@ -5,15 +5,16 @@ require_once '../db_connection.php';
 
 // Tangkap filter dari GET
 $where = [];
-if (!empty($_GET['periode'])) {
-    $periode = intval($_GET['periode']);
+if (!empty($_GET['periode_id']) && $_GET['periode_id'] != 0) {
+    $periode = intval($_GET['periode_id']);
     $where[] = "pk.periode_id = $periode";
 }
-if (!empty($_GET['unit'])) {
-    $unit = intval($_GET['unit']);
+if (!empty($_GET['unit_id']) && $_GET['unit_id'] != 0) {
+    $unit = intval($_GET['unit_id']);
     $where[] = "k.unit_project_id = $unit";
 }
 
+//Quray Utama
 $sql = "SELECT 
             pk.id,
             pk.total_nilai,
@@ -58,8 +59,11 @@ ob_start();
     .page-break { page-break-after: always; }
 </style>
 <?php
+$totalData = $result->num_rows; // hitung total data
+$no = 0;
 while ($penilaian = $result->fetch_assoc()):
     // Ambil detail penilaian per indikator
+    $no++;
     $stmt = $conn->prepare("SELECT 
                 f.nama AS nama_faktor,
                 ik.nama AS nama_indikator,
@@ -210,7 +214,9 @@ while ($penilaian = $result->fetch_assoc()):
         </tbody>
     </table>
 
-    <div class="page-break"></div>
+    <?php if ($no < $totalData): ?>
+        <div class="page-break"></div>
+    <?php endif; ?>
 
 <?php endwhile; ?>
 
