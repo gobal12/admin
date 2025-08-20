@@ -196,7 +196,7 @@ $faktor = mysqli_query($conn, "SELECT * FROM faktor_kompetensi");
                     title: 'Berhasil',
                     text: data.message || 'Data penilaian berhasil disimpan.'
                 }).then(() => {
-                    window.location.href = 'datakpi.php'; // ganti sesuai halaman tujuan
+                    window.location.href = 'form-kpi.php';
                 });
             } else {
                 Swal.fire({

@@ -35,7 +35,7 @@ try {
 
     // Rata-rata nilai per faktor
     $stmt = $conn->prepare("
-        SELECT pk.karyawan_id, ik.faktor_id, AVG(dp.hasil) AS avg_nilai
+        SELECT pk.karyawan_id, ik.faktor_id, AVG(dp.nilai) AS avg_nilai
         FROM detail_penilaian dp
         JOIN penilaian_kpi pk ON pk.id = dp.penilaian_id
         JOIN indikator_kompetensi ik ON ik.id = dp.indikator_id

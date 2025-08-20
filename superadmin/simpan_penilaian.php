@@ -19,9 +19,26 @@ if (!$karyawan_id || !$periode_id || empty($nilai_input)) {
     exit;
 }
 
-$conn->begin_transaction();
-
 try {
+    // 🔹 Cek apakah penilaian sudah ada
+    $stmt = $conn->prepare("SELECT id FROM penilaian_kpi WHERE karyawan_id = ? AND periode_id = ?");
+    $stmt->bind_param("ii", $karyawan_id, $periode_id);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        $stmt->close();
+        echo json_encode([
+            'success' => false,
+            'message' => 'Penilaian KPI untuk karyawan ini pada periode tersebut sudah ada.'
+        ]);
+        exit;
+    }
+    $stmt->close();
+
+    // 🔹 Mulai transaksi
+    $conn->begin_transaction();
+
     // 1. Insert penilaian_kpi sementara dengan total_nilai = 0
     $stmt = $conn->prepare("INSERT INTO penilaian_kpi (karyawan_id, periode_id, total_nilai, catatan) VALUES (?, ?, 0, ?)");
     $stmt->bind_param("iis", $karyawan_id, $periode_id, $catatan);
