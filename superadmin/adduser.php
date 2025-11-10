@@ -81,7 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Begin Page Content -->
                 <div class="container fluid">
-                    <h2 class="mb-4">Tambah User</h2>
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Tambah User</h4>
+                    </div>
+                    <div class="card-body">
                     <form id="formUser">
                         <div class="form-group mb-3">
                             <label>Nama</label>
@@ -94,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <button type="submit" class="btn btn-primary">Simpan</button>
                         <a href="datakaryawan.php" class="btn btn-secondary">Kembali</a>
                     </form>
+                    </div>
                 </div>
 
             <!-- Footer -->

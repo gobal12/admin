@@ -66,9 +66,10 @@ if (!$result) {
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data Jabatan</h1>
-                    <p class="mb-4">Menampilkan list Jabatan yang telah terdaftar pada CMS KPI Nutech Operation</p>
-
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Data Jabatan</h4>
+                        <p class="mb-4">Menampilkan list Jabatan yang telah terdaftar pada CMS KPI Nutech Operation</p>
+                    </div>
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
     

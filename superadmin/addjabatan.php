@@ -69,7 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                    <h1 class="h3 mb-4 text-gray-800">Tambah Jabatan</h1>
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Tambah Jabatan</h4>
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <form id="jabatanForm">

@@ -142,16 +142,16 @@
         </a>
         <div id="collapseKPI" class="collapse" data-parent="#accordionSidebar">
             <div class="py-2 collapse-inner rounded">
-                <a class="collapse-item" href="form-kpi.php">Form Input KPI</a>
+                <!-- <a class="collapse-item" href="form-kpi.php">Form Input KPI</a> -->
                 <a class="collapse-item" href="datakpi.php">Data KPI</a>
-                <a class="collapse-item" href="dataindikator.php">Data Faktor Kompetensi</a>
-                <a class="collapse-item" href="periodepenilaian.php">Data Periode</a>
+                <!-- <a class="collapse-item" href="dataindikator.php">Data Faktor Kompetensi</a>
+                <a class="collapse-item" href="periodepenilaian.php">Data Periode</a> -->
             </div>
         </div>
     </li>
 
     <!-- AHP Menu -->
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAHP" title="AHP">
             <i class="fas fa-balance-scale"></i>
             <span>KPI Alternatif</span>
@@ -163,10 +163,10 @@
                 <a class="collapse-item" href="hasil_ahp.php">Hasil Penghitungan</a>
             </div>
         </div>
-    </li>
+    </li> -->
 
     <!-- Data Master -->
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseData" title="Manajemen Data">
             <i class="fas fa-database"></i>
             <span>Manajemen Data</span>
@@ -178,7 +178,7 @@
                 <a class="collapse-item" href="datajabatan.php">Jabatan</a>
             </div>
         </div>
-    </li>
+    </li> -->
 
     <!-- Profile -->
     <li class="nav-item">

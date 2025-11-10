@@ -94,8 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Begin Page Content -->
                 <div class="container fluid">
-                    <h2 class="mb-4">Tambah Karyawan</h2>
-                    <form id="formKaryawan">
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Tambah Karyawan</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <form id="formKaryawan">
                         <div class="form-group mb-3">
                             <label>Nama</label>
                             <input type="text" class="form-control" name="nama" required>
@@ -139,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <button type="submit" class="btn btn-primary">Simpan</button>
                         <a href="datakaryawan.php" class="btn btn-secondary">Kembali</a>
                     </form>
+                    </div>
                 </div>
             <!-- End of Main Content -->
 

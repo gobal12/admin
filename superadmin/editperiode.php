@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label>Status </label>
                         <select name="status" class="form-control" required>
                             <option value="Active" <?= $data['status'] == 'Active' ? 'selected' : '' ?>>Active</option>
-                            <option value="Unactive" <?= $data['status'] == 'Unactive' ? 'selected' : '' ?>>Unactive</option>
+                            <option value="Inactive" <?= $data['status'] == 'Inactive' ? 'selected' : '' ?>>Inactive</option>
                         </select>
                         
                         <button type="submit" class="btn btn-primary mt-3">Simpan Perubahan</button>

@@ -57,6 +57,14 @@ try {
     }
     $stmt->close();
 
+    // Cek jika tidak ada data rata-rata (avg kosong)
+    if (empty($avg)) {
+        $conn->rollback();
+        $response['message'] = "Data penilaian tidak ditemukan untuk periode $periode_id.";
+        echo json_encode($response);
+        exit;
+    }
+
     $insertDetailStmt = $conn->prepare("
         INSERT INTO detail_penilaian_ahp (penilaian_id, periode_id, faktor_id, nilai, hasil)
         VALUES (?, ?, ?, ?, ?)

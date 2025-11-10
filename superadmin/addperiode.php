@@ -80,7 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Begin Page Content -->
     <div class="container fluid">
-        <h2 class="mb-4">Tambah Periode Baru</h2>
+        <div class="card-header py-3 bg-primary text-white">
+            <h4 class="m-0 font-weight-bold">Tambah Periode Baru</h4>
+        </div>
+
+        <div class="card-body">
+
         <form id="formPeriode" method="POST">
             <label>Periode</label>
             <input type="text" name="nama_periode" class="form-control" placeholder="Contoh: Q1 - 2026" required>
@@ -100,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <button type="submit" class="btn btn-primary mt-3">Simpan Periode</button>
         </form>
+    </div>
     </div>
     <!-- End of Main Content -->
 

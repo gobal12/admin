@@ -72,15 +72,16 @@ if (!$result) {
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data Faktor Kompetensi</h1>
-                    <p class="mb-4">Menampilkan list Faktor Kompetensi</p>
-
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Data Faktor Kompetensi</h4>
+                        <p class="mb-4">Menampilkan list Faktor Kompetensi</p>
+                    </div>
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
     
-                    <div class="card-header py-3">
+                    <!-- <div class="card-header py-3">
                         <a href="addkaryawan.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Tambah Faktor Kompetensi</a>
-                    </div>
+                    </div> -->
 
                         <div class="card-body">
                             <div class="table-responsive">
@@ -90,7 +91,7 @@ if (!$result) {
                                         <th>No</th>
                                         <th>Faktor Kompetensi</th>
                                         <th>Indikator Kompetensi</th>
-                                        <th>
+                                        <!-- <th>
                                         <span data-bs-toggle="tooltip" data-bs-placement="top" title="Total bobot harus 100%">
                                             Bobot (%)
                                         </span>
@@ -100,7 +101,7 @@ if (!$result) {
                                             Target
                                         </span>
                                         </th>
-                                        <th>Action</th>
+                                        <th>Action</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -112,12 +113,12 @@ if (!$result) {
                                             echo "<td>" . $nomor . "</td>";
                                             echo "<td>" . $row["faktor"] . "</td>";
                                             echo "<td>" . $row["indikator"] . "</td>";
-                                            echo "<td>" . $row["bobot"] . "</td>";
-                                            echo "<td>" . $row["target"] . "</td>";
-                                            echo "<td>";
-                                            echo "<a href='editkaryawan.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a> ";
-                                            echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
-                                            echo "</td>";
+                                            // echo "<td>" . $row["bobot"] . "</td>";
+                                            // echo "<td>" . $row["target"] . "</td>";
+                                            // echo "<td>";
+                                            // echo "<a href='editkaryawan.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a> ";
+                                            // echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
+                                            // echo "</td>";
                                             echo "</tr>";
                                             $nomor++;
                                         }

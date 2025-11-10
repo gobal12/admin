@@ -93,8 +93,10 @@ $unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name AS
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Data KPI</h1>
-                    <p class="mb-4">Menampilkan Data KPI yang sudah di Input</p>
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Data KPI</h4>
+                        <p class="mb-4">Menampilkan Data KPI yang sudah di Input</p>
+                    </div>
 
                     <!-- DataTales Example --><div class="card shadow mb-4">   
                     <div class="card-body">

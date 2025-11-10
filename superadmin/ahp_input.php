@@ -58,7 +58,9 @@ $n = count($faktor);
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                        <h3>Input Perbandingan Faktor AHP</h3>
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Input Perbandingan Faktor AHP</h4>
+                    </div>
 <div class="alert alert-info">
     <strong>Panduan Pengisian:</strong>
     <ul class="mb-0">

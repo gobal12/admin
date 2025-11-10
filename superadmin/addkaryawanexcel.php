@@ -49,8 +49,10 @@ include '../db_connection.php';
 <?php include 'layouts/page_start.php'; ?>
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
-                    <h1 class="h3 mb-4 text-gray-800">Tambah Karyawan</h1>
+                <div class="container-fluid">                    
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Tambah Karyawan</h4>
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <form id="importForm" enctype="multipart/form-data">

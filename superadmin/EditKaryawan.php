@@ -128,7 +128,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Begin Page Content -->
                 <div class="container fluid">
-                    <h2 class="mb-4">Data Karyawan</h2>
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h4 class="m-0 font-weight-bold">Data Karyawan</h4>
+                    </div>
+
+                    <div class="card-body">
+
                     <form id="formKaryawan">
                         <input type="hidden" name="user_id" value="<?= $data['user_id'] ?>">
                         <input type="hidden" name="karyawan_pk" value="<?= $data['karyawan_pk'] ?>">
@@ -177,6 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <button type="submit" class="btn btn-primary mt-3">Simpan Perubahan</button>
                     </form>
+                    </div>
                 </div>
                 <!-- End of Main Content -->
 

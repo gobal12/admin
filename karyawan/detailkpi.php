@@ -9,7 +9,7 @@ function check_role($required_role) {
     }
 }
 
-check_role('admin');
+check_role('karyawan');
 
 $logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
 include '../db_connection.php';

@@ -1,60 +1,40 @@
 <?php
 session_start();
+require_once '../db_connection.php';
 
-//Cek role user
+// 🔒 Cek role user
 function check_role($required_role) {
-    if ($_SESSION['role'] !== $required_role) {
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== $required_role) {
         header("Location: ../access_denied.php");
         exit();
     }
 }
-
 check_role('admin');
 
-$logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
+$logged_in_user = $_SESSION['name'] ?? 'Guest';
 
-include '../db_connection.php';
-
-// Ambil daftar karyawan (karyawans.id) dan nama user (users.name)
-$sql = "SELECT k.id AS karyawan_id, u.name AS user_name, up.name AS unit_name, up.id AS unit_id
-        FROM karyawans k
-        JOIN users u ON k.user_id = u.id
-        JOIN unit_projects up ON k.unit_project_id = up.id";
-$result = mysqli_query($conn, $sql);
-
-// Ambil daftar periode
-$periode = mysqli_query($conn, "SELECT id, nama_periode FROM periode_penilaian WHERE Status = 'Active'");
-
-// Ambil faktor dan indikator
-$faktor = mysqli_query($conn, "SELECT * FROM faktor_kompetensi");
-
+// 🧩 Ambil daftar unit-project, periode aktif, faktor & indikator
+$unit_result = mysqli_query($conn, "SELECT id, name FROM unit_projects ORDER BY name ASC");
+$periode_result = mysqli_query($conn, "SELECT id, nama_periode FROM periode_penilaian WHERE Status = 'Active'");
+$faktor_result = mysqli_query($conn, "SELECT * FROM faktor_kompetensi ORDER BY id ASC");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>KPI Nutech Operation - Data Jabatan</title>
+    <title>KPI Nutech Operation - Form Penilaian</title>
 
     <!-- Custom fonts for this template -->
-    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900" rel="stylesheet">
+    
     <!-- Custom styles for this template -->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this page -->
-    <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-
-    <!--Konfirmasi Delete -->
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -62,160 +42,166 @@ $faktor = mysqli_query($conn, "SELECT * FROM faktor_kompetensi");
 
 <?php include 'layouts/page_start.php'; ?>
 
-                <!-- Begin Page Content -->
-                <div class="container fluid">
-                    <h2 class="mb-4">Form Penilian</h2>
-                        <form id="formPenilaian" method="POST">
-                            <div class="form-group">
-                                <label for="unit_id">Unit</label>
-                                <select name="unit_id" id="unit_id" class="form-control" required>
-                                    <option value="">-- Pilih Unit / Project --</option>
-                                    <?php
-                                    $unit_result = mysqli_query($conn, "SELECT id, name FROM unit_projects");
-                                    while ($u = mysqli_fetch_assoc($unit_result)) {
-                                        echo "<option value='" . $u['id'] . "'>" . htmlspecialchars($u['name']) . "</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-primary text-white">
+            <h4 class="m-0 font-weight-bold">Form Penilaian Kinerja Karyawan (KPI)</h4>
+        </div>
 
-                            <div class="form-group">
-                                <label for="karyawan_id">Karyawan</label>
-                                <select name="karyawan_id" id="karyawan_id" class="form-control" required>
-                                    <option value="">-- Pilih Karyawan --</option>
-                                    <!-- Diisi dinamis via JS -->
-                                </select>
-                            </div>
+        <div class="card-body">
+            <form id="formPenilaian" method="POST">
 
-                            <div class="form-group"> 
-                                <label for="periode_id">Periode</label>
-                                <select name="periode_id" class="form-control" required>
-                                    <option value="">-- Pilih Periode --</option>
-                                    <?php
-                                    while ($row = mysqli_fetch_assoc($periode)) {
-                                        echo "<option value='" . htmlspecialchars($row['id']) . "' selected>" . 
-                                            htmlspecialchars($row['nama_periode']) . 
-                                            "</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
-                            <?php
-                            while ($f = mysqli_fetch_assoc($faktor)) {
-                                echo "<h4>" . htmlspecialchars($f['nama']) . "</h4>";
-                                echo "<table class='table table-bordered'>";
-                                echo "<thead><tr><th>Indikator</th><th>Bobot (%)</th><th>Target</th><th>Nilai (%)</th></tr></thead><tbody>";
-
-                                $indikator = mysqli_query($conn, "SELECT * FROM indikator_kompetensi WHERE faktor_id = {$f['id']}");
-                                while ($i = mysqli_fetch_assoc($indikator)) {
-                                    echo "<tr>";
-                                    echo "<td>" . htmlspecialchars($i['nama']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($i['bobot']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($i['target']) . "</td>";
-                                    echo "<td>
-                                            <input type='number' name='nilai[" . $i['id'] . "]' step='0.01' min='0' max='100' required>
-                                            <input type='hidden' name='bobot[" . $i['id'] . "]' value='" . $i['bobot'] . "'>
-                                        </td>";
-                                    echo "</tr>";
-                                }
-                                echo "</tbody></table>";
-                            }
-                            ?>
-
-                            <div class="form-group">
-                                <label for="catatan">Catatan</label>
-                                <textarea name="catatan" class="form-control" rows="4" placeholder="Tulis catatan penilaian di sini..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary mt-3">Simpan</button>
-                        </form>
+                <!-- Pilihan Unit -->
+                <div class="form-group">
+                    <label for="unit_id"><strong>Unit / Project</strong></label>
+                    <select name="unit_id" id="unit_id" class="form-control" required>
+                        <option value="">-- Pilih Unit / Project --</option>
+                        <?php while ($u = mysqli_fetch_assoc($unit_result)): ?>
+                            <option value="<?= htmlspecialchars($u['id']) ?>">
+                                <?= htmlspecialchars($u['name']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
                 </div>
-                <!-- End of Main Content -->
 
-            <!-- Footer -->
-            <?php include 'layouts/footer.php'; ?>
+                <!-- Pilihan Karyawan -->
+                <div class="form-group">
+                    <label for="karyawan_id"><strong>Karyawan</strong></label>
+                    <select name="karyawan_id" id="karyawan_id" class="form-control" required>
+                        <option value="">-- Pilih Karyawan --</option>
+                    </select>
+                </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                <!-- Pilihan Periode -->
+                <div class="form-group">
+                    <label for="periode_id"><strong>Periode Penilaian</strong></label>
+                    <select name="periode_id" id="periode_id" class="form-control" required>
+                        <option value="">-- Pilih Periode --</option>
+                        <?php while ($p = mysqli_fetch_assoc($periode_result)): ?>
+                            <option value="<?= htmlspecialchars($p['id']) ?>" selected>
+                                <?= htmlspecialchars($p['nama_periode']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
 
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+                <hr>
 
-    <!-- Custom scripts for all pages-->
-    <script src="../js/sb-admin-2.min.js"></script>
+                <!-- Tabel Faktor dan Indikator -->
+                <?php while ($f = mysqli_fetch_assoc($faktor_result)): ?>
+                    <div class="mt-4">
+                        <h5 class="text-primary font-weight-bold mb-3"><?= htmlspecialchars($f['nama']) ?></h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th width="70%">Indikator Kompetensi</th>
+                                        <th width="30%" class="text-center">Nilai (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $indikator_result = mysqli_query(
+                                        $conn,
+                                        "SELECT * FROM indikator_kompetensi WHERE faktor_id = {$f['id']} ORDER BY id ASC"
+                                    );
+                                    while ($i = mysqli_fetch_assoc($indikator_result)):
+                                    ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($i['nama']) ?></td>
+                                            <td class="text-center">
+                                                <input type="number" 
+                                                       name="nilai[<?= $i['id'] ?>]" 
+                                                       class="form-control text-center" 
+                                                       step="0.01" min="0" max="100" required>
+                                                <input type="hidden" name="bobot[<?= $i['id'] ?>]" 
+                                                       value="<?= htmlspecialchars($i['bobot']) ?>">
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
 
-    <!-- Page level plugins -->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+                <!-- Catatan -->
+                <div class="form-group mt-4">
+                    <label for="catatan"><strong>Catatan Tambahan</strong></label>
+                    <textarea name="catatan" id="catatan" class="form-control" rows="4"
+                        placeholder="Tulis catatan penilaian di sini..."></textarea>
+                </div>
 
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/datatables-demo.js"></script>
+                <!-- Tombol Simpan -->
+                <div class="text-left">
+                    <button type="submit" class="btn btn-primary mt-3 px-4">
+                        <i class=""></i> Simpan Penilaian
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-    <!-- Get Nama Karyawan by Unit -->
-    <script>
-    document.getElementById('unit_id').addEventListener('change', function () {
-        const unitId = this.value;
-        const karyawanSelect = document.getElementById('karyawan_id');
-        karyawanSelect.innerHTML = '<option value="">-- Pilih Karyawan --</option>';
+<?php include 'layouts/footer.php'; ?>
 
-        if (unitId) {
-            fetch('get_karyawan.php?unit_id=' + unitId)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(function (karyawan) {
-                        const option = document.createElement('option');
-                        option.value = karyawan.karyawan_id;
-                        option.text = karyawan.name;
-                        karyawanSelect.add(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Gagal memuat karyawan:', error);
+<!-- Script JS -->
+<script src="../vendor/jquery/jquery.min.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="../js/sb-admin-2.min.js"></script>
+
+<!-- Dynamic Karyawan Load -->
+<script>
+document.getElementById('unit_id').addEventListener('change', function() {
+    const unitId = this.value;
+    const karyawanSelect = document.getElementById('karyawan_id');
+    karyawanSelect.innerHTML = '<option value="">-- Pilih Karyawan --</option>';
+
+    if (unitId) {
+        fetch('get_karyawan.php?unit_id=' + unitId)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(k => {
+                    const option = document.createElement('option');
+                    option.value = k.karyawan_id;
+                    option.text = k.name;
+                    karyawanSelect.add(option);
                 });
-        }
-    });
-    </script>
+            })
+            .catch(err => console.error('Gagal memuat karyawan:', err));
+    }
+});
+</script>
 
-    <!-- Konfirmasi Penilaian KPI -->
-    <script>
-    document.getElementById('formPenilaian').addEventListener('submit', function(e) {
-        e.preventDefault();
+<!-- Submit Penilaian -->
+<script>
+document.getElementById('formPenilaian').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
 
-        const formData = new FormData(this);
-
-        fetch('simpan_penilaian.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: data.message || 'Data penilaian berhasil disimpan.'
-                }).then(() => {
-                    window.location.href = 'form-kpi.php';
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: data.message || 'Terjadi kesalahan saat menyimpan data.'
-                });
-            }
-        })
-        .catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.message
-            });
+    fetch('simpan_penilaian.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        Swal.fire({
+            icon: data.success ? 'success' : 'error',
+            title: data.success ? 'Berhasil' : 'Gagal',
+            text: data.message || (data.success
+                ? 'Data penilaian berhasil disimpan.'
+                : 'Terjadi kesalahan saat menyimpan data.')
+        }).then(() => {
+            if (data.success) location.reload();
         });
+    })
+    .catch(err => {
+        Swal.fire({ icon: 'error', title: 'Error', text: err.message });
     });
-    </script>
+});
+</script>
 
 </body>
-
 </html>

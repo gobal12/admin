@@ -127,7 +127,9 @@ $low_karyawan = $conn->query("
 
 <div class="container-fluid">
     <main class="container-fluid px-4 py-4">
-        <h1 class="h3 mb-2 text-gray-800">Dashboard</h1>
+        <div class="card-header py-3 bg-primary text-white">
+            <h4 class="m-0 font-weight-bold">Dashboard</h4>
+        </div>
         <hr>
 
         <!-- Filter -->
