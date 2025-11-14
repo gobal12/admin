@@ -48,15 +48,20 @@ if ($result->num_rows === 0) {
 ob_start();
 ?>
 <style>
-    body { font-family: Arial, sans-serif; font-size: 12px; }
+    body { font-family: Arial, sans-serif; font-size: 11px; }
     table, th, td { border: 1px solid black; border-collapse: collapse; }
-    th, td { padding: 6px; }
+    th, td { padding: 5px; }
     .ttd-cell {
-        height: 80px;
+        height: 70px;
         vertical-align: bottom;
         text-align: center;
+        font-size: 11px;
     }
     .page-break { page-break-after: always; }
+    .header-table th, .header-table td { padding: 6px; font-size: 12px; }
+    .main-table th { font-size: 10px; }
+    .main-table td { font-size: 10px; }
+    .catatan-table td { padding: 8px; }
 </style>
 <?php
 $totalData = $result->num_rows; // hitung total data
@@ -64,26 +69,26 @@ $no = 0;
 while ($penilaian = $result->fetch_assoc()):
     // Ambil detail penilaian per indikator
     $no++;
+    // === Kueri Detail Diperbaiki ===
     $stmt = $conn->prepare("SELECT 
                 f.nama AS nama_faktor,
                 ik.nama AS nama_indikator,
-                ik.bobot,
-                ik.target,
+                ik.bobot_indikator,
                 dp.nilai,
                 dp.hasil
             FROM detail_penilaian dp
             JOIN indikator_kompetensi ik ON dp.indikator_id = ik.id
             JOIN faktor_kompetensi f ON ik.faktor_id = f.id
             WHERE dp.penilaian_id = ?
-            ORDER BY f.id, ik.nama");
+            ORDER BY f.id, ik.id"); // Urutkan berdasarkan f.id lalu ik.id
     $stmt->bind_param("i", $penilaian['id']);
     $stmt->execute();
     $detail = $stmt->get_result();
     $stmt->close();
     ?>
 
-    <h3 style="text-align: center;">KEY PERFORMANCE INDICATOR (KPI) KARYAWAN PT. NUTECH INTEGRASI</h3>
-    <table width="100%" border="1" style="border-collapse: collapse; font-size: 12px;">
+    <h3 style="text-align: center; margin-bottom: 15px;">KEY PERFORMANCE INDICATOR (KPI) KARYAWAN PT. NUTECH INTEGRASI</h3>
+    <table width="100%" class="header-table">
         <tr>
             <th style="width: 25%; text-align: left;">PERIODE PENILAIAN</th>
             <td style="width: 25%;"><?= htmlspecialchars($penilaian['nama_periode']) ?></td>
@@ -91,27 +96,27 @@ while ($penilaian = $result->fetch_assoc()):
             <td style="width: 25%; text-align: center;">PENILAIAN / DAFTAR NILAI</td>
         </tr>
         <tr>
-            <th>Nama Karyawan</th>
+            <th style="text-align: left;">Nama Karyawan</th>
             <td><?= htmlspecialchars($penilaian['nama_karyawan']) ?></td>
-            <td rowspan="4" style="text-align: center; vertical-align: middle; font-size: 16px;">
+            <td rowspan="4" style="text-align: center; vertical-align: middle; font-size: 20px; font-weight: bold;">
                 <?= number_format($penilaian['total_nilai'], 2) ?>
             </td>
-            <td>4,00 — <strong>Sangat Baik</strong></td>
+            <td style="font-size: 11px;">4,00 — <strong>Sangat Baik</strong></td>
         </tr>
         <tr>
-            <th>Bagian - Unit</th>
+            <th style="text-align: left;">Bagian - Unit</th>
             <td><?= htmlspecialchars($penilaian['unit_project']) ?></td>
-            <td>3,00 — <strong>Baik</strong></td>
+            <td style="font-size: 11px;">3,00 — <strong>Baik</strong></td>
         </tr>
         <tr>
-            <th>Tgl. Mulai Bekerja</th>
+            <th style="text-align: left;">Tgl. Mulai Bekerja</th>
             <td><?= date('d F Y', strtotime($penilaian['hire_date'])) ?></td>
-            <td>2,00 — <strong>Kurang</strong></td>
+            <td style="font-size: 11px;">2,00 — <strong>Kurang</strong></td>
         </tr>
         <tr>
-            <th>Tgl. Penilaian</th>
-            <td><?= date('d-M-y', strtotime($penilaian['tanggal_input'])) ?></td>
-            <td>1,00 — <strong>Buruk</strong></td>
+            <th style="text-align: left;">Tgl. Penilaian</th>
+            <td><?= date('d F Y', strtotime($penilaian['tanggal_input'])) ?></td>
+            <td style="font-size: 11px;">1,00 — <strong>Buruk</strong></td>
         </tr>
     </table>
     <br>
@@ -119,13 +124,13 @@ while ($penilaian = $result->fetch_assoc()):
     <table width="100%">
       <tr>
         <td style="width: 70%; vertical-align: top;">
-          <table width="100%" border="1">
+          <table width="100%" class="main-table">
             <thead style="background-color: #007bff; color: #ffffff; text-align: center;">
               <tr>
-                <th>FAKTOR KOMPETENSI</th>
-                <th>BOBOT</th>
+                <th style="width: 40%;">FAKTOR KOMPETENSI</th>
+                <th>BOBOT (%)</th>
                 <th>TARGET</th>
-                <th>NILAI</th>
+                <th>NILAI (1-4)</th>
                 <th>HASIL</th>
               </tr>
             </thead>
@@ -141,7 +146,7 @@ while ($penilaian = $result->fetch_assoc()):
                           if ($currentFaktor !== '') {
                               echo "<tr style='background-color: #d0e2ff; font-weight: bold;'>
                                       <td style='text-align:center;'>Total {$currentFaktor}</td>
-                                      <td style='text-align:center;'>" . number_format($subtotalBobot, 2) . "</td>
+                                      <td style='text-align:center;'>" . number_format($subtotalBobot, 2) . "%</td>
                                       <td style='text-align:center;'>" . number_format($subtotalTarget, 2) . "</td>
                                       <td style='text-align:center;'>Score</td>
                                       <td style='text-align:center;'>" . number_format($subtotalHasil, 2) . "</td>
@@ -157,27 +162,34 @@ while ($penilaian = $result->fetch_assoc()):
                                 </tr>";
                       endif;
 
+                      // === Logika Baru ===
+                      $target_dinamis = ($row['bobot_indikator'] / 100) * 4.00;
+
                       echo "<tr>
                               <td>" . htmlspecialchars($row['nama_indikator']) . "</td>
-                              <td style='text-align:center;'>" . number_format($row['bobot'], 2) . "</td>
-                              <td style='text-align:center;'>" . number_format($row['target'], 2) . "</td>
-                              <td style='text-align:center;'>" . number_format($row['nilai'], 2) . "</td>
+                              <td style='text-align:center;'>" . number_format($row['bobot_indikator'], 2) . "</td>
+                              <td style='text-align:center;'>" . number_format($target_dinamis, 2) . "</td>
+                              <td style='text-align:center;'>" . (int)$row['nilai'] . "</td>
                               <td style='text-align:center;'>" . number_format($row['hasil'], 2) . "</td>
                             </tr>";
 
-                      $subtotalBobot += $row['bobot'];
-                      $subtotalTarget += $row['target'];
+                      $subtotalBobot += $row['bobot_indikator'];
+                      $subtotalTarget += $target_dinamis;
                       $subtotalHasil += $row['hasil'];
                   endwhile;
 
+                  // Cetak subtotal terakhir
                   echo "<tr style='background-color: #d0e2ff; font-weight: bold;'>
                           <td style='text-align:center;'>Total {$currentFaktor}</td>
-                          <td style='text-align:center;'>" . number_format($subtotalBobot, 2) . "</td>
+                          <td style='text-align:center;'>" . number_format($subtotalBobot, 2) . "%</td>
                           <td style='text-align:center;'>" . number_format($subtotalTarget, 2) . "</td>
                           <td style='text-align:center;'>Score</td>
                           <td style='text-align:center;'>" . number_format($subtotalHasil, 2) . "</td>
                         </tr>";
+                  
+                  $totalHasil += $subtotalHasil;
 
+                  // Cetak total score
                   echo "<tr style='background-color: #c8f7c5; font-weight: bold;'>
                           <td colspan='4' style='text-align:right;'>TOTAL SCORE</td>
                           <td style='text-align:center;'>" . number_format($penilaian['total_nilai'], 2) . "</td>
@@ -191,9 +203,9 @@ while ($penilaian = $result->fetch_assoc()):
         </td>
 
         <td style="width: 30%; vertical-align: top;">
-          <table width="100%" border="1">
+          <table width="100%">
             <thead>
-              <tr><th style="text-align: center;">Tanda Tangan</th></tr>
+              <tr><th style="text-align: center; font-size: 11px;">Tanda Tangan</th></tr>
             </thead>
             <tbody>
               <tr><td class="ttd-cell"><?= $penilaian['nama_karyawan']; ?><br><small>Karyawan</small></td></tr>
@@ -205,9 +217,9 @@ while ($penilaian = $result->fetch_assoc()):
         </td>
       </tr>
     </table>
-    <table width="100%" border="1" style="margin-top: 20px;">
+    <table width="100%" class="catatan-table" style="margin-top: 15px;">
         <thead>
-            <tr><th style="background-color: #f8f8f8; text-align: left;">Catatan</th></tr>
+            <tr><th style="background-color: #f8f8f8; text-align: left; font-size: 11px;">Catatan</th></tr>
         </thead>
         <tbody>
             <tr><td><?= nl2br(htmlspecialchars($penilaian['catatan'] ?? '-')) ?></td></tr>
@@ -228,5 +240,5 @@ $dompdf = new Dompdf();
 $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
-$dompdf->stream("penilaian_kpi_all.pdf", ["Attachment" => true]);
+$dompdf->stream("penilaian_kpi_all.pdf", ["Attachment" => false]); // Set Attachment ke false untuk preview
 ?>

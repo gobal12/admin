@@ -129,12 +129,17 @@ $unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name AS
                             </select>
                         </div>
 
-                        <!-- Tombol Cetak Semua -->
+                        <!-- Tombol Cetak Semua & Download Excel-->
                         <div class="col-md-4 d-flex align-items-end">
                             <a href="cetak_all_kpi.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
                             target="_blank" 
                             class="btn btn-success ml-auto">
                                 <i class="fas fa-print"></i> Cetak Semua
+                            </a>
+
+                            <a href="export_excel.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
+                            class="btn btn-info ml-2">
+                                <i class="fas fa-file-excel"></i> Export Excel
                             </a>
                         </div>
                     </form>

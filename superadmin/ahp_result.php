@@ -63,12 +63,12 @@ $konsistensi = $res2->fetch_assoc();
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <div class="card-header py-3 bg-primary text-white">
-                        <h4 class="m-0 font-weight-bold">Hasil Perhitungan Bobot</h4>
+                        <h4 class="m-0 font-weight-bold">Perhitungan Bobot</h4>
                     </div>
                 <!-- Tombol ke form input -->
                 <div class="card-header py-3">
                     <a href="ahp_input.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Update Bobot</a>           
-                    <a href="ahp.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Hitung Penilaian</a>
+                    <!-- <a href="ahp.php" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Hitung Penilaian</a> -->
                 </div>
                 <div class="row">
                     <!-- Card Tabel Bobot -->
