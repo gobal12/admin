@@ -16,14 +16,15 @@ $logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
 
 require_once '../db_connection.php';
 
-// Query baru sesuai struktur database
+// Query baru: Ditambahkan k.status
 $sql = "SELECT 
             k.id, 
             u.name AS nama_user,
             u.email, 
             k.karyawan_id AS nik, 
             j.name AS jabatan, 
-            up.name AS unit
+            up.name AS unit,
+            k.status  /* <-- TAMBAHAN BARU */
         FROM users u
         INNER JOIN karyawans k ON u.id = k.user_id
         INNER JOIN jabatans j ON k.jabatan_id = j.id
@@ -34,6 +35,7 @@ $result = $conn->query($sql);
 if (!$result) {
     die("Error executing query: " . $conn->error);
 }
+?>
 ?>
 
 
@@ -72,13 +74,11 @@ if (!$result) {
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    <!-- Page Heading -->
                     <div class="card-header py-3 bg-primary text-white">
                         <h4 class="m-0 font-weight-bold">Data Karyawan</h4>
                         <p class="mb-4">Menampilkan list Karyawan yang telah terdaftar pada CMS KPI Nutech Operation</p>
                     </div>
                     
-                    <!-- DataTales Example -->
                     <div class="card shadow mb-4">
     
                     <div class="card-header py-3">
@@ -97,7 +97,7 @@ if (!$result) {
                                         <th>Email</th>
                                         <th>Unit / Project</th>
                                         <th>Jabatan</th>
-                                        <th>Action</th>
+                                        <th>Status</th> <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -107,11 +107,21 @@ if (!$result) {
                                         while($row = $result->fetch_assoc()) {
                                             echo "<tr>";
                                             echo "<td>" . $nomor . "</td>";
-                                            echo "<td>" . $row["nik"] . "</td>";
-                                            echo "<td>" . $row["nama_user"] . "</td>";
-                                            echo "<td>" . $row["email"] . "</td>";
-                                            echo "<td>" . $row["unit"] . "</td>";
-                                            echo "<td>" . $row["jabatan"] . "</td>";
+                                            echo "<td>" . htmlspecialchars($row["nik"]) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row["nama_user"]) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row["email"]) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row["unit"]) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row["jabatan"]) . "</td>";
+                                            
+                                            // ===== PERBAIKAN DI SINI =====
+                                            // 'if' di baris ini sudah di-uncomment
+                                            if ($row["status"] == 'Aktif') { 
+                                                echo "<td><span class='badge badge-success'>Aktif</span></td>";
+                                            } else {
+                                                echo "<td><span class='badge badge-danger'>Non Aktif</span></td>";
+                                            }
+                                            // ===== END PERBAIKAN =====
+                                            
                                             echo "<td>";
                                             echo "<a href='editkaryawan.php?id=" . $row["id"] . "' class='btn btn-primary' title='Edit'><i class='fas fa-edit'></i></a> ";
                                             echo "<button type='button' class='btn btn-danger' onclick='confirmDelete(" . $row["id"] . ", event)' title='Delete'><i class='far fa-trash-alt'></i></button>";
@@ -120,7 +130,9 @@ if (!$result) {
                                             $nomor++;
                                         }
                                     } else {
-                                        echo "<tr><td colspan='7'>Data tidak ditemukan</td></tr>";
+                                        // ===== PERBAIKAN DI SINI =====
+                                        // 'echo' di baris ini sudah di-uncomment
+                                        echo "<tr><td colspan='8'>Data tidak ditemukan</td></tr>";
                                     }
                                     ?>
                                 </tbody>

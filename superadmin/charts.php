@@ -25,7 +25,7 @@ $units = $conn->query("SELECT id, name FROM unit_projects ORDER BY name ASC");
 // Ambil data periode
 $periodes = $conn->query("SELECT id, nama_periode FROM periode_penilaian ORDER BY id ASC");
 
-// ===== BARU: Ambil Daftar Faktor untuk Header & Kueri =====
+// ===== BARU: Ambil Daftar Faktor untuk Header Tabel =====
 $faktorList = [];
 $resFaktor = $conn->query("SELECT id, nama FROM faktor_kompetensi ORDER BY id");
 while ($row = $resFaktor->fetch_assoc()) {
@@ -38,48 +38,97 @@ $ahp_faktor_selects = ""; // Untuk AHP
 
 foreach ($faktorList as $f) {
     $fid = $f['id'];
-    
-    // Klausa AHP (lebih mudah, dari detail_penilaian_ahp)
     $ahp_faktor_selects .= ", MAX(CASE WHEN dpa.faktor_id = $fid THEN dpa.hasil END) AS F_AHP_$fid \n";
-    
-    // Klausa KPI (lebih kompleks, harus SUM(hasil) dari indikator)
     $kpi_faktor_selects .= ", SUM(CASE WHEN ik.faktor_id = $fid THEN dp.hasil END) AS F_KPI_$fid \n";
 }
 
 
-// ===== Filter WHERE (Tidak Berubah) =====
-// Filter untuk KPI (tabel pk)
-$where_kpi = "WHERE 1=1";
+// ===== Filter WHERE (Direvisi Total untuk STATUS) =====
+
+// Filter Karyawan (hanya berdasarkan unit)
+$where_karyawan = "WHERE 1=1";
+if ($filter_unit) $where_karyawan .= " AND unit_project_id = ".intval($filter_unit);
+
+// Filter Karyawan AKTIF (hanya berdasarkan unit)
+$where_karyawan_aktif = $where_karyawan . " AND status = 'Aktif'";
+
+// Filter Penilaian (berdasarkan unit, periode, DAN STATUS AKTIF)
+$where_kpi = "WHERE k.status = 'Aktif'"; // <-- FILTER UTAMA BARU
 if ($filter_unit) $where_kpi .= " AND k.unit_project_id = ".intval($filter_unit);
 if ($filter_periode) $where_kpi .= " AND pk.periode_id = ".intval($filter_periode);
 
-// Filter untuk AHP (tabel pkahp)
-$where_ahp = "WHERE 1=1";
+// Filter Penilaian AHP (berdasarkan unit, periode, DAN STATUS AKTIF)
+$where_ahp = "WHERE k.status = 'Aktif'"; // <-- FILTER UTAMA BARU
 if ($filter_unit) $where_ahp .= " AND k.unit_project_id = ".intval($filter_unit);
 if ($filter_periode) $where_ahp .= " AND pkahp.periode_id = ".intval($filter_periode);
 
 
-// ===== 1. STATISTIK (Tidak Berubah) =====
-// (Statistik umum tidak perlu diubah, kita biarkan)
-$count_penilaian_kpi = $conn->query("SELECT COUNT(*) as total FROM penilaian_kpi pk JOIN karyawans k ON pk.karyawan_id = k.id $where_kpi")->fetch_assoc()['total'];
-$rata2_kpi = $conn->query("SELECT AVG(pk.total_nilai) as rata FROM penilaian_kpi pk JOIN karyawans k ON pk.karyawan_id = k.id $where_kpi")->fetch_assoc()['rata'] ?? 0;
-$count_penilaian_ahp = $conn->query("SELECT COUNT(*) as total FROM penilaian_kpi_ahp pkahp JOIN karyawans k ON pkahp.karyawan_id = k.id $where_ahp")->fetch_assoc()['total'];
-$rata2_ahp = $conn->query("SELECT AVG(pkahp.total_nilai) as rata FROM penilaian_kpi_ahp pkahp JOIN karyawans k ON pkahp.karyawan_id = k.id $where_ahp")->fetch_assoc()['rata'] ?? 0;
+// ===== 1. STATISTIK (DIRUBAH TOTAL UNTUK STATUS AKTIF) =====
+
+// Box 1: Total Karyawan (Semua Status)
+$total_karyawan_count = $conn->query("SELECT COUNT(id) as total FROM karyawans $where_karyawan")->fetch_assoc()['total'];
+
+// Box 2: Total Karyawan Aktif
+$total_karyawan_aktif_count = $conn->query("SELECT COUNT(id) as total FROM karyawans $where_karyawan_aktif")->fetch_assoc()['total'];
+
+// Box 3: Karyawan Aktif Sudah Dinilai
+$sudah_dinilai_count = $conn->query("SELECT COUNT(DISTINCT pk.karyawan_id) as total FROM penilaian_kpi pk JOIN karyawans k ON pk.karyawan_id = k.id $where_kpi")->fetch_assoc()['total'];
+
+// Box 4: Karyawan Aktif Belum Dinilai
+$belum_dinilai_count = $total_karyawan_aktif_count - $sudah_dinilai_count;
 
 
-// ===== 2. DATA GRAFIK (Tidak Berubah) =====
-// (Grafik utama tidak perlu diubah)
-// Data Grafik KPI
-$kpi_periode_data = $conn->query("SELECT p.id, p.nama_periode, AVG(pk.total_nilai) AS rata_nilai FROM penilaian_kpi pk JOIN periode_penilaian p ON pk.periode_id = p.id JOIN karyawans k ON pk.karyawan_id = k.id $where_kpi GROUP BY p.id, p.nama_periode ORDER BY p.id ASC");
-$labels_kpi = []; $values_kpi = [];
-while ($row = $kpi_periode_data->fetch_assoc()) { $labels_kpi[] = $row['nama_periode']; $values_kpi[] = round($row['rata_nilai'], 2); }
-// Data Grafik AHP
-$ahp_periode_data = $conn->query("SELECT p.id, p.nama_periode, AVG(pkahp.total_nilai) AS rata_nilai FROM penilaian_kpi_ahp pkahp JOIN periode_penilaian p ON pkahp.periode_id = p.id JOIN karyawans k ON pkahp.karyawan_id = k.id $where_ahp GROUP BY p.id, p.nama_periode ORDER BY p.id ASC");
-$labels_ahp = []; $values_ahp = [];
-while ($row = $ahp_periode_data->fetch_assoc()) { $labels_ahp[] = $row['nama_periode']; $values_ahp[] = round($row['rata_nilai'], 4); }
+// ===== 2. DATA GRAFIK (PERBAIKAN LOGIKA BELUM DINILAI) =====
+$where_graph_unit_filter = ""; 
+if ($filter_unit) {
+    $graph_join_unit_condition = "AND k.unit_project_id = ".intval($filter_unit);
+} else {
+    $graph_join_unit_condition = "";
+}
+
+$graph_where_periode_condition = "WHERE 1=1";
+if ($filter_periode) {
+    $graph_where_periode_condition .= " AND p.id = ".intval($filter_periode);
+}
+
+// Kueri mengambil 'sudah dinilai' per periode (hanya karyawan aktif)
+$sql_graph = "
+    SELECT 
+        p.id, 
+        p.nama_periode,
+        COUNT(DISTINCT pk.karyawan_id) AS sudah_dinilai_in_periode
+    FROM 
+        periode_penilaian p
+    LEFT JOIN 
+        penilaian_kpi pk ON p.id = pk.periode_id
+    LEFT JOIN
+        karyawans k ON pk.karyawan_id = k.id AND k.status = 'Aktif' $graph_join_unit_condition
+    $graph_where_periode_condition
+    GROUP BY 
+        p.id, p.nama_periode
+    ORDER BY 
+        p.id ASC
+";
+
+$graph_data_query = $conn->query($sql_graph);
+
+$labels_graph = [];
+$values_sudah_dinilai = [];
+$values_belum_dinilai = [];
+
+while ($row = $graph_data_query->fetch_assoc()) {
+    $labels_graph[] = $row['nama_periode'];
+    
+    $sudah = intval($row['sudah_dinilai_in_periode']);
+    // PERBAIKAN: 'Belum' dihitung dari 'Total Aktif'
+    $belum = $total_karyawan_aktif_count - $sudah; 
+    
+    $values_sudah_dinilai[] = $sudah;
+    $values_belum_dinilai[] = $belum;
+}
 
 
-// ===== 3. TOP/BOTTOM 3 (KUERI DIUBAH TOTAL) =====
+// ===== 3. TOP/BOTTOM 5 (FILTER STATUS AKTIF DITERAPKAN DARI $where_kpi / $where_ahp) =====
 
 // --- KUERI KPI DENGAN PIVOT FAKTOR ---
 $sql_kpi_base = "
@@ -93,14 +142,11 @@ $sql_kpi_base = "
     JOIN unit_projects up ON k.unit_project_id = up.id
     LEFT JOIN detail_penilaian dp ON dp.penilaian_id = pk.id
     LEFT JOIN indikator_kompetensi ik ON dp.indikator_id = ik.id
-    $where_kpi
+    $where_kpi -- Filter status aktif sudah ada di sini
     GROUP BY pk.id, u.name, pk.total_nilai, p.nama_periode, up.name
 ";
-
-// Top 3 KPI
-$top_karyawan_kpi = $conn->query($sql_kpi_base . " ORDER BY pk.total_nilai DESC LIMIT 3");
-// Bottom 3 KPI
-$low_karyawan_kpi = $conn->query($sql_kpi_base . " ORDER BY pk.total_nilai ASC LIMIT 3");
+$top_karyawan_kpi = $conn->query($sql_kpi_base . " ORDER BY pk.total_nilai DESC LIMIT 5");
+$low_karyawan_kpi = $conn->query($sql_kpi_base . " ORDER BY pk.total_nilai ASC LIMIT 5");
 
 
 // --- KUERI AHP DENGAN PIVOT FAKTOR ---
@@ -114,14 +160,11 @@ $sql_ahp_base = "
     JOIN periode_penilaian p ON pkahp.periode_id = p.id
     JOIN unit_projects up ON k.unit_project_id = up.id
     LEFT JOIN detail_penilaian_ahp dpa ON dpa.penilaian_id = pkahp.id
-    $where_ahp
+    $where_ahp -- Filter status aktif sudah ada di sini
     GROUP BY pkahp.id, u.name, pkahp.total_nilai, p.nama_periode, up.name
 ";
-
-// Top 3 AHP
-$top_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai DESC LIMIT 3");
-// Bottom 3 AHP
-$low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai ASC LIMIT 3");
+$top_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai DESC LIMIT 5");
+$low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai ASC LIMIT 5");
 
 ?>
 
@@ -145,9 +188,15 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
             -webkit-overflow-scrolling: touch;
         }
         
-        /* ===== CSS BARU UNTUK MENGECILKAN FONT TABEL ===== */
         .table-ranking {
-            font-size: 0.8rem; /* Anda bisa sesuaikan nilainya, misal 0.85rem atau 13px */
+            font-size: 0.8rem;
+        }
+        
+        .card-stats .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 120px;
         }
     </style>
 </head>
@@ -186,22 +235,54 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
         </form>
 
         <div class="row text-center mb-4">
-            <div class="col-md-3"><div class="card shadow"><div class="card-body"><h5>Total Penilaian (KPI)</h5><p class="fs-4"><?= $count_penilaian_kpi ?></p></div></div></div>
-            <div class="col-md-3"><div class="card shadow"><div class="card-body"><h5>Rata-rata Nilai (KPI)</h5><p class="fs-4"><?= number_format($rata2_kpi, 2) ?></p></div></div></div>
-            <div class="col-md-3"><div class="card shadow"><div class="card-body bg-light"><h5>Total Penilaian (AHP)</h5><p class="fs-4"><?= $count_penilaian_ahp ?></p></div></div></div>
-            <div class="col-md-3"><div class="card shadow"><div class="card-body bg-light"><h5>Rata-rata Nilai (AHP)</h5><p class="fs-4"><?= number_format($rata2_ahp, 3) ?></p></div></div></div>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow card-stats">
+                    <div class="card-body">
+                        <h5>Total Karyawan</h5>
+                        <p class="fs-4 font-weight-bold text-dark"><?= $total_karyawan_count ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow card-stats">
+                    <div class="card-body">
+                        <h5>Total Karyawan Aktif</h5>
+                        <p class="fs-4 font-weight-bold text-primary"><?= $total_karyawan_aktif_count ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow card-stats">
+                    <div class="card-body">
+                        <h5>Aktif Sudah Dinilai</h5>
+                        <p class="fs-4 font-weight-bold text-success"><?= $sudah_dinilai_count ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow card-stats">
+                    <div class="card-body">
+                        <h5>Aktif Belum Dinilai</h5>
+                        <p class="fs-4 font-weight-bold text-danger"><?= $belum_dinilai_count ?></p>
+                    </div>
+                </div>
+            </div>
         </div>
-
         <div class="row">
-            <div class="col-lg-6"><div class="card shadow mb-4"><div class="card-body"><h5>Grafik Rata-rata Nilai KPI per Periode (Skala 1-4)</h5><canvas id="kpiChart"></canvas></div></div></div>
-            <div class="col-lg-6"><div class="card shadow mb-4"><div class="card-body"><h5>Grafik Rata-rata Nilai AHP per Periode (Skala 0-1)</h5><canvas id="ahpChart"></canvas></div></div></div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="card shadow mb-4">
                     <div class="card-body">
-                        <h5>Top 3 Karyawan Berdasarkan KPI (Tertinggi)</h5>
+                        <h5>Grafik Penilaian Karyawan per Periode (Hanya Karyawan Aktif)</h5>
+                        <canvas id="penilaianChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6"> 
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <h5>Top 5 Karyawan Aktif Berdasarkan KPI (Tertinggi)</h5>
                         <div class="table-responsive">
                             <table class="table table-striped table-sm table-ranking mt-3">
                                 <thead>
@@ -236,7 +317,7 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
                 </div>
                 <div class="card shadow mb-5">
                     <div class="card-body">
-                        <h5>Bottom 3 Karyawan Berdasarkan KPI (Terendah)</h5>
+                        <h5>Bottom 5 Karyawan Aktif Berdasarkan KPI (Terendah)</h5>
                         <div class="table-responsive">
                             <table class="table table-striped table-sm table-ranking mt-3">
                                 <thead>
@@ -274,7 +355,7 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
             <div class="col-lg-6">
                 <div class="card shadow mb-4">
                     <div class="card-body bg-light">
-                        <h5>Top 3 Karyawan Berdasarkan AHP (Tertinggi)</h5>
+                        <h5>Top 5 Karyawan Aktif Berdasarkan AHP (Tertinggi)</h5>
                         <div class="table-responsive">
                             <table class="table table-striped table-sm table-ranking mt-3">
                                 <thead>
@@ -309,7 +390,7 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
                 </div>
                 <div class="card shadow mb-5">
                     <div class="card-body bg-light">
-                        <h5>Bottom 3 Karyawan Berdasarkan AHP (Terendah)</h5>
+                        <h5>Bottom 5 Karyawan Aktif Berdasarkan AHP (Terendah)</h5>
                         <div class="table-responsive">
                             <table class="table table-striped table-sm table-ranking mt-3">
                                 <thead>
@@ -343,7 +424,7 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
 
     </main>
 </div>
@@ -357,21 +438,49 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
 <script src="../vendor/chart.js/Chart.min.js"></script>
 
 <script>
-// 1. Chart KPI
-const ctxKpi = document.getElementById('kpiChart').getContext('2d');
-new Chart(ctxKpi, {
-    type: 'bar', data: { labels: <?= json_encode($labels_kpi) ?>,
-        datasets: [{ label: 'Rata-rata KPI', data: <?= json_encode($values_kpi) ?>, backgroundColor: 'rgba(54, 162, 235, 0.7)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1 }]
+// 1. Chart Penilaian (Stacked)
+const ctxPenilaian = document.getElementById('penilaianChart').getContext('2d');
+new Chart(ctxPenilaian, {
+    type: 'bar', 
+    data: { 
+        labels: <?= json_encode($labels_graph) ?>,
+        datasets: [
+            { 
+                label: 'Sudah Dinilai', 
+                data: <?= json_encode($values_sudah_dinilai) ?>, 
+                backgroundColor: 'rgba(75, 192, 192, 0.7)', // Hijau
+                borderColor: 'rgba(75, 192, 192, 1)', 
+                borderWidth: 1 
+            },
+            { 
+                label: 'Belum Dinilai', 
+                data: <?= json_encode($values_belum_dinilai) ?>, 
+                backgroundColor: 'rgba(255, 99, 132, 0.7)', // Merah
+                borderColor: 'rgba(255, 99, 132, 1)', 
+                borderWidth: 1 
+            }
+        ]
     },
-    options: { responsive: true, scales: { yAxes: [{ ticks: { beginAtZero: true, min: 0, max: 4.0, stepSize: 0.5 }, scaleLabel: { display: true, labelString: 'Rata-rata Nilai KPI (1-4)' } }], xAxes: [{ scaleLabel: { display: true, labelString: 'Periode' } }] } }
-});
-// 2. Chart AHP
-const ctxAhp = document.getElementById('ahpChart').getContext('2d');
-new Chart(ctxAhp, {
-    type: 'bar', data: { labels: <?= json_encode($labels_ahp) ?>,
-        datasets: [{ label: 'Rata-rata Nilai AHP', data: <?= json_encode($values_ahp) ?>, backgroundColor: 'rgba(75, 192, 192, 0.7)', borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 1 }]
-    },
-    options: { responsive: true, scales: { yAxes: [{ ticks: { beginAtZero: true, min: 0, max: 1.0, stepSize: 0.1 }, scaleLabel: { display: true, labelString: 'Rata-rata Nilai AHP (0-1)' } }], xAxes: [{ scaleLabel: { display: true, labelString: 'Periode' } }] } }
+    options: { 
+        responsive: true, 
+        tooltips: {
+            mode: 'index',
+            intersect: false
+        },
+        scales: { 
+            yAxes: [{ 
+                stacked: true, // Membuat bar bertumpuk
+                ticks: { 
+                    beginAtZero: true, 
+                }, 
+                scaleLabel: { display: true, labelString: 'Jumlah Karyawan' } 
+            }], 
+            xAxes: [{ 
+                stacked: true, // Membuat bar bertumpuk
+                scaleLabel: { display: true, labelString: 'Periode' } 
+            }] 
+        } 
+    }
 });
 </script>
 </body>

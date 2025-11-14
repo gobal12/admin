@@ -97,10 +97,10 @@ try {
 
     // 5. Commit semua perubahan
     $conn->commit();
-
+    
     echo json_encode([
         'success' => true,
-        'message' => 'Penilaian berhasil disimpan. Total Score: ' . number_format($grand_total_score, 2),
+        'message' => 'Penilaian berhasil disimpan.', // <-- UBAH SEPERTI INI
         'total_nilai' => number_format($grand_total_score, 2)
     ]);
 

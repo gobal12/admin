@@ -10,12 +10,17 @@ if (!isset($_GET['unit_id'])) {
 
 $unit_id = (int) $_GET['unit_id'];
 
+// 1. Kueri SQL diperbarui dengan filter status
 $sql = "SELECT k.id AS karyawan_id, u.name 
         FROM karyawans k
         JOIN users u ON k.user_id = u.id
-        WHERE k.unit_project_id = $unit_id";
+        WHERE k.unit_project_id = ? AND k.status = 'Aktif'"; // <-- Filter 'Aktif' ditambahkan di sini
 
-$result = mysqli_query($conn, $sql);
+// 2. Menggunakan Prepared Statements untuk keamanan
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $unit_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 $data = [];
 if ($result) {
@@ -24,4 +29,8 @@ if ($result) {
     }
 }
 
+mysqli_stmt_close($stmt);
+mysqli_close($conn);
+
 echo json_encode($data);
+?>

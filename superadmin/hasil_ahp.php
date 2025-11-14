@@ -47,16 +47,15 @@ while ($row = $resUnit->fetch_assoc()) {
 
 <div class="container-fluid">
     <div class="card-header py-3 bg-primary text-white">
-        <h4 class="m-0 font-weight-bold">Data KPI</h4>
+        <h4 class="m-0 font-weight-bold">Data Hasil AHP</h4>
         <p class="mb-4">Menampilkan Data perhitungan AHP</p>
     </div>
 
-    <!-- Tabel data -->
     <div class="card shadow mb-4">
         <div class="card-body">
-            <!-- Filter -->
+            
             <form method="GET" class="mb-3 row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="periode_id">Filter Periode:</label>
                     <select name="periode_id" id="periode_id" class="form-control" onchange="this.form.submit()">
                         <option value="0" <?= $periode_id === 0 ? 'selected' : '' ?>>-- Semua Periode --</option>
@@ -68,7 +67,7 @@ while ($row = $resUnit->fetch_assoc()) {
                     </select>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="unit_id">Filter Unit / Project:</label>
                     <select name="unit_id" id="unit_id" class="form-control" onchange="this.form.submit()">
                         <option value="0" <?= $unit_id === 0 ? 'selected' : '' ?>>-- Semua Unit / Project --</option>
@@ -79,7 +78,21 @@ while ($row = $resUnit->fetch_assoc()) {
                         <?php endforeach; ?>
                     </select>
                 </div>
+
+                <div class="col-md-6 d-flex align-items-end justify-content-end">
+                    <a href="cetak_all_ahp.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
+                    target="_blank" 
+                    class="btn btn-success ml-auto">
+                        <i class="fas fa-print"></i> Cetak Semua
+                    </a>
+
+                    <a href="export_excel_ahp.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
+                    class="btn btn-info ml-2">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </a>
+                </div>
             </form>
+
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
@@ -98,7 +111,7 @@ while ($row = $resUnit->fetch_assoc()) {
                             }
                             ?>
                             <th>Nilai Akhir</th>
-                        </tr>
+                            <th>Aksi</th> </tr>
                     </thead>
                     <tbody>
                         <?php
@@ -166,6 +179,21 @@ while ($row = $resUnit->fetch_assoc()) {
                             }
 
                             echo "<td>" . number_format($row['total_nilai'], 4) . "</td>";
+                            
+                            // TOMBOL AKSI BARU
+                            echo '<td style="white-space: nowrap;">
+                                    <a href="detail_ahp.php?penilaian_id=' . htmlspecialchars($row['penilaian_id']) . '" 
+                                    class="btn btn-outline-info btn-sm" 
+                                    title="Lihat Detail Penilaian">
+                                    <i class="fas fa-eye"></i> Detail
+                                    </a>
+
+                                    <a href="cetak_ahp.php?penilaian_id=' . htmlspecialchars($row['penilaian_id']) . '" 
+                                    class="btn btn-outline-primary btn-sm" 
+                                    title="Cetak Penilaian" target="_blank">
+                                    <i class="fas fa-print"></i> Cetak
+                                    </a>
+                                </td>';
                             echo "</tr>";
                         }
                         ?>
@@ -174,6 +202,7 @@ while ($row = $resUnit->fetch_assoc()) {
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <?php include 'layouts/footer.php'; ?>

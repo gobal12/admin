@@ -1,153 +1,149 @@
 <?php
 // --- LOGIKA DINAMIS DIMULAI DI SINI ---
-
-// 1. Dapatkan nama file halaman saat ini
 $current_page = basename($_SERVER['SCRIPT_NAME']);
 
-// 2. Tentukan grup halaman untuk setiap menu dropdown
-$kpi_pages   = ['form-kpi.php', 'datakpi.php', 'dataindikator.php', 'periodepenilaian.php'];
-$ahp_pages   = ['ahp_result.php', 'ahp.php', 'hasil_ahp.php'];
-$data_pages  = ['datakaryawan.php', 'dataunit_projects.php', 'datajabatan.php'];
+$laporan_pages = [
+    'datakpi.php', 
+    'hasil_ahp.php',
+    'detailkpi.php',
+    'cetak_kpi.php',
+    'cetak_all_kpi.php',
+    'detail_ahp.php',
+    'cetak_ahp.php',
+    'cetak_all_ahp.php'
+];
+
+$setup_pages = [
+    'ahp_result.php', 'addjabatan.php', 'addkaryawan.php', 'addkaryawanexcel.php',
+    'addunit_projects.php', 'addperiode.php', 'ahp_input.php', 'ahp_result.php',
+    'adduser.php', 'ahp_process.php', 'ahp.php', 'editperiode.php',
+    'editkaryawan.php', 'kelola_faktor.php', 'kelola_indikator.php', 'dataindikator.php',
+    'periodepenilaian.php', 'datakaryawan.php', 'datajabatan.php', 'dataunit_projects.php'
+];
+
 $profile_pages = ['profile.php'];
 
-// 3. Cek apakah menu induk (parent) harus aktif
-$is_kpi_active = in_array($current_page, $kpi_pages);
-$is_ahp_active = in_array($current_page, $ahp_pages);
-$is_data_active = in_array($current_page, $data_pages);
+$is_laporan_active = in_array($current_page, $laporan_pages);
+$is_setup_active   = in_array($current_page, $setup_pages);
 $is_profile_active = in_array($current_page, $profile_pages);
-
 // --- LOGIKA DINAMIS SELESAI ---
 ?>
 
 <style>
-/* --- Warna dan tampilan submenu --- */
+/* 1. Buat Sidebar "nempel" (fixed) di kiri */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0; /* Membentang setinggi layar */
+    z-index: 1001; /* Di atas topbar */
+    
+    overflow-y: auto; /* Scroll HANYA jika menu sidebar panjang */
+    overflow-x: hidden;
+    
+    /* Tentukan lebar normal di sini */
+    width: 14rem; /* 224px */
+    transition: width 0.3s ease;
+}
+
+/* 2. SAAT DI-MINIMIZE (TOGGLED), HILANGKAN TOTAL */
+.sidebar.toggled {
+    width: 0 !important;
+    overflow: hidden; /* Sembunyikan konten saat mengecil */
+}
+/* CSS default template akan otomatis menyembunyikan .nav-link span, dll. */
+
+
+/* 3. Atur Content Wrapper agar tidak tertutup sidebar */
+#content-wrapper {
+    margin-left: 14rem; /* Lebar sidebar normal */
+    transition: margin-left 0.3s ease;
+}
+/* Saat sidebar hilang */
+.sidebar.toggled ~ #content-wrapper {
+    margin-left: 0; /* Content wrapper jadi full-width */
+}
+
+/* 4. Buat Topbar "nempel" (fixed) di atas */
+/* (Ini mengasumsikan topbar.php ada di dalam #content) */
+#content .topbar {
+    position: fixed;
+    top: 0;
+    left: 14rem; /* 224px (mengikuti content wrapper) */
+    right: 0;
+    z-index: 1000;
+    transition: left 0.3s ease; 
+}
+/* Saat sidebar hilang */
+.sidebar.toggled ~ #content-wrapper #content .topbar {
+    left: 0; /* Topbar jadi full-width */
+}
+
+/* 5. Beri padding di atas konten utama */
+#content {
+    padding-top: 4.375rem; /* 70px (tinggi topbar) */
+}
+
+/* ================================================================= */
+
+/* --- Style Submenu (Tidak Berubah) --- */
 .sidebar .collapse-inner {
     background-color: #4e73df !important;
     color: white;
 }
-
 .sidebar .collapse-inner .collapse-item {
     color: white !important;
     background-color: transparent !important;
     font-weight: normal;
     transition: font-weight 0.2s ease-in-out;
 }
-
 .sidebar .collapse-inner .collapse-item:hover {
     background-color: transparent !important;
     font-weight: bold;
     color: white !important;
 }
-
-/* ============================================
-TAMBAHAN: Buat link yang aktif menjadi BOLD
-============================================
-*/
 .sidebar .collapse-inner .collapse-item.active {
     font-weight: bold !important;
 }
 
-/* --- Struktur Sidebar --- */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
-}
-/* ... (sisa style Anda tetap sama) ... */
-.sidebar .nav-item {
-    width: 100%;
-}
-
+/* --- Style Sidebar Normal (Expanded) (Tidak Berubah) --- */
 .sidebar .nav-link {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+    padding-left: 1rem; /* Teks rata kiri */
+    justify-content: flex-start;
+    height: auto;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
 }
-
 .sidebar .nav-link i {
-    font-size: 20px;
-    line-height: 1;
+    font-size: 1.1rem;
+    margin-right: 0.5rem; /* Jarak ikon ke teks */
 }
 
-/* --- Sembunyikan teks saat sidebar ditoggle --- */
-@media (min-width: 768px) {
-    .sidebar.toggled .nav-link span {
-        display: none;
-    }
-}
-
-/* --- Hilangkan efek hover popout --- */
-.sidebar.toggled .collapse {
-    display: none !important;
-    position: static !important;
-    box-shadow: none !important;
-    background: none !important;
-}
-
-/* Pastikan submenu muncul saat diklik (default Bootstrap) */
-.sidebar .collapse.show {
+/* --- Perilaku Submenu (Tidak Berubah) --- */
+.sidebar:not(.toggled) .collapse.show {
     display: block !important;
 }
-
-/* --- Mode kecil (tablet/mobile) --- */
-@media (max-width: 1024px) {
-    body.sidebar-toggled .sidebar {
-        width: 70px !important;
-        overflow: visible !important;
-    }
-
-    body.sidebar-toggled .sidebar .nav-link {
-        text-align: center !important;
-        padding: 0.75rem 0 !important;
-        position: relative;
-    }
-
-    body.sidebar-toggled .sidebar .nav-link i {
-        font-size: 1.3rem !important;
-        display: block !important;
-        margin-bottom: 4px;
-    }
-
-    /* Submenu tampil di dalam sidebar, bukan popout */
-    body.sidebar-toggled .sidebar .collapse {
+@media (max-width: 767px) {
+    .sidebar .collapse {
         position: static !important;
         background-color: #4e73df !important;
-        border-radius: 0 !important;
-        padding: 0.5rem;
-        display: none;
     }
-
-    /* Saat diklik, baru muncul */
-    body.sidebar-toggled .sidebar .collapse.show {
+    .sidebar .collapse.show {
         display: block !important;
-    }
-
-    /* Hilangkan teks & heading di mode kecil */
-    body.sidebar-toggled .sidebar .sidebar-brand-text,
-    body.sidebar-toggled .sidebar .nav-link span,
-    body.sidebar-toggled .sidebar-heading {
-        display: none !important;
-    }
-
-    body.sidebar-toggled #content-wrapper {
-        margin-left: 70px !important;
     }
 }
 </style>
 
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="charts.php">
-        <div class="sidebar-brand-icon rotate-n-15">
-            <i class="fas fa-chart-line"></i>
-        </div>
-        <div class="sidebar-brand-text mx-3">KPI Nutech</div>
-    </a>
-
+    
     <hr class="sidebar-divider my-0">
+
+    <li class="nav-item <?php echo ($current_page == '') ? 'active' : ''; ?>">
+        <a class="nav-link" href="#" title="">
+            <i class=""></i>
+            <span></span>
+        </a>
+    </li>
 
     <li class="nav-item <?php echo ($current_page == 'charts.php') ? 'active' : ''; ?>">
         <a class="nav-link" href="charts.php" title="Dashboard">
@@ -158,50 +154,63 @@ TAMBAHAN: Buat link yang aktif menjadi BOLD
 
     <hr class="sidebar-divider">
 
-    <div class="sidebar-heading">Interface</div>
+    <div class="sidebar-heading">
+        Penilaian
+    </div>
 
-    <li class="nav-item <?php echo $is_kpi_active ? 'active' : ''; ?>">
-        <a class="nav-link <?php echo !$is_kpi_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseKPI" title="KPI">
-            <i class="fas fa-chart-bar"></i>
-            <span>KPI</span>
+    <li class="nav-item <?php echo ($current_page == 'form-kpi.php') ? 'active' : ''; ?>">
+        <a class="nav-link" href="form-kpi.php" title="Input Penilaian Kinerja">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Input Penilaian</span>
         </a>
-        <div id="collapseKPI" class="collapse <?php echo $is_kpi_active ? 'show' : ''; ?>" data-parent="#accordionSidebar">
+    </li>
+
+    <li class="nav-item <?php echo $is_laporan_active ? 'active' : ''; ?>">
+        <a class="nav-link <?php echo !$is_laporan_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseLaporan" title="Laporan Kinerja">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Laporan Kinerja</span>
+        </a>
+        <div id="collapseLaporan" class="collapse <?php echo $is_laporan_active ? 'show' : ''; ?>" data-parent="#accordionSidebar">
             <div class="py-2 collapse-inner rounded">
-                <a class="collapse-item <?php echo ($current_page == 'form-kpi.php') ? 'active' : ''; ?>" href="form-kpi.php">Form Input KPI</a>
-                <a class="collapse-item <?php echo ($current_page == 'datakpi.php') ? 'active' : ''; ?>" href="datakpi.php">Data KPI</a>
-                <a class="collapse-item <?php echo ($current_page == 'dataindikator.php') ? 'active' : ''; ?>" href="dataindikator.php">Data Faktor Kompetensi</a>
-                <a class="collapse-item <?php echo ($current_page == 'periodepenilaian.php') ? 'active' : ''; ?>" href="periodepenilaian.php">Data Periode</a>
+                <h6 class="collapse-header">Lihat Hasil:</h6>
+                <a class="collapse-item <?php echo ($current_page == 'datakpi.php') ? 'active' : ''; ?>" href="datakpi.php">Hasil (Metode Eksisting)</a>
+                <a class="collapse-item <?php echo ($current_page == 'hasil_ahp.php') ? 'active' : ''; ?>" href="hasil_ahp.php">Hasil (Metode AHP)</a>
             </div>
         </div>
     </li>
 
-    <li class="nav-item <?php echo $is_ahp_active ? 'active' : ''; ?>">
-        <a class="nav-link <?php echo !$is_ahp_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseAHP" title="AHP">
-            <i class="fas fa-balance-scale"></i>
-            <span>KPI Alternatif</span>
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Admin & Setup
+    </div>
+
+    <li class="nav-item <?php echo $is_setup_active ? 'active' : ''; ?>">
+        <a class="nav-link <?php echo !$is_setup_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseSetup" title="Setup Sistem">
+            <i class="fas fa-fw fa-cogs"></i>
+            <span>Setup Sistem</span>
         </a>
-        <div id="collapseAHP" class="collapse <?php echo $is_ahp_active ? 'show' : ''; ?>" data-parent="#accordionSidebar">
+        <div id="collapseSetup" class="collapse <?php echo $is_setup_active ? 'show' : ''; ?>" data-parent="#accordionSidebar">
             <div class="py-2 collapse-inner rounded">
-                <a class="collapse-item <?php echo ($current_page == 'ahp_result.php') ? 'active' : ''; ?>" href="ahp_result.php">Penghitungan Bobot</a>
-                <a class="collapse-item <?php echo ($current_page == 'ahp.php') ? 'active' : ''; ?>" href="ahp.php">Menghitung Hasil</a>
-                <a class="collapse-item <?php echo ($current_page == 'hasil_ahp.php') ? 'active' : ''; ?>" href="hasil_ahp.php">Hasil Penghitungan</a>
+                <h6 class="collapse-header">Setup Metodologi (AHP):</h6>
+                <a class="collapse-item <?php echo ($current_page == 'ahp_result.php') ? 'active' : ''; ?>" href="ahp_result.php">Setup Bobot Kriteria</a>
+                <a class="collapse-item <?php echo ($current_page == 'ahp.php') ? 'active' : ''; ?>" href="ahp.php">Proses Hasil AHP</a>
+                
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Setup Master KPI:</h6>
+                <a class="collapse-item <?php echo ($current_page == 'dataindikator.php') ? 'active' : ''; ?>" href="dataindikator.php">Faktor & Indikator</a>
+                <a class="collapse-item <?php echo ($current_page == 'periodepenilaian.php') ? 'active' : ''; ?>" href="periodepenilaian.php">Periode Penilaian</a>
+
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Setup Master Data:</h6>
+                <a class="collapse-item <?php echo ($current_page == 'datakaryawan.php') ? 'active' : ''; ?>" href="datakaryawan.php">Data Karyawan</a>
+                <a class="collapse-item <?php echo ($current_page == 'datajabatan.php') ? 'active' : ''; ?>" href="datajabatan.php">Data Jabatan</a>
+                <a class="collapse-item <?php echo ($current_page == 'dataunit_projects.php') ? 'active' : ''; ?>" href="dataunit_projects.php">Data Unit</a>
             </div>
         </div>
     </li>
 
-    <li class="nav-item <?php echo $is_data_active ? 'active' : ''; ?>">
-        <a class="nav-link <?php echo !$is_data_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseData" title="Manajemen Data">
-            <i class="fas fa-database"></i>
-            <span>Manajemen Data</span>
-        </a>
-        <div id="collapseData" class="collapse <?php echo $is_data_active ? 'show' : ''; ?>" data-parent="#accordionSidebar">
-            <div class="py-2 collapse-inner rounded">
-                <a class="collapse-item <?php echo ($current_page == 'datakaryawan.php') ? 'active' : ''; ?>" href="datakaryawan.php">Karyawan</a>
-                <a class="collapse-item <?php echo ($current_page == 'dataunit_projects.php') ? 'active' : ''; ?>" href="dataunit_projects.php">Unit</a>
-                <a class="collapse-item <?php echo ($current_page == 'datajabatan.php') ? 'active' : ''; ?>" href="datajabatan.php">Jabatan</a>
-            </div>
-        </div>
-    </li>
+    <hr class="sidebar-divider d-none d-md-block">
 
     <li class="nav-item <?php echo $is_profile_active ? 'active' : ''; ?>">
         <a class="nav-link <?php echo !$is_profile_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseProfile">
@@ -217,8 +226,5 @@ TAMBAHAN: Buat link yang aktif menjadi BOLD
     </li>
 
     <hr class="sidebar-divider d-none d-md-block">
-    <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" id="sidebarToggle" title="Collapse Sidebar"></button>
-        </div>
-    </ul>
 
+</ul>

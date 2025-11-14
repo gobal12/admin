@@ -112,8 +112,6 @@ foreach ($indikators_raw as $ind) {
                                 <thead class="thead-light">
                                     <tr>
                                         <th>Indikator Kompetensi</th>
-                                        <th width="10%" class="text-center">Bobot (%)</th>
-                                        <th width="10%" class="text-center">Target</th>
                                         <th width="20%" class="text-center">Nilai (1-4)</th>
                                     </tr>
                                 </thead>
@@ -123,13 +121,11 @@ foreach ($indikators_raw as $ind) {
                                     
                                     if (count($current_indikators) > 0) :
                                         foreach ($current_indikators as $i):
-                                            // Hitung Target
+                                            // Variabel $target tetap di-pass, tapi tidak ditampilkan
                                             $target = ($i['bobot_indikator'] / 100) * 4.00;
                                     ?>
                                     <tr>
                                         <td><?= htmlspecialchars($i['nama']) ?></td>
-                                        <td class="text-center"><?= htmlspecialchars($i['bobot_indikator']) ?>%</td>
-                                        <td class="text-center"><?= number_format($target, 2) ?></td>
                                         <td class="text-center">
                                             <select name="nilai[<?= $i['id'] ?>]" 
                                                     class="form-control text-center nilai-selector" 
@@ -153,24 +149,10 @@ foreach ($indikators_raw as $ind) {
                                     else:
                                     ?>
                                     <tr>
-                                        <td colspan="4" class="text-center font-italic">(Belum ada indikator)</td>
-                                    </tr>
+                                        <td colspan="2" class="text-center font-italic">(Belum ada indikator)</td> </tr>
                                     <?php endif; ?>
                                 </tbody>
-                                <tfoot class="table-secondary">
-                                    <tr>
-                                        <td colspan="3" class="text-right font-weight-bold">
-                                            SCORE (Total: <?= $f['bobot_faktor'] ?>% | Target: <?= number_format(($f['bobot_faktor']/100)*4, 2) ?>)
-                                        </td>
-                                        <td>
-                                            <input type="text" 
-                                                   id="score_faktor_<?= $f['id'] ?>" 
-                                                   class="form-control text-center font-weight-bold score-faktor-input" 
-                                                   readonly>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                </table>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -179,15 +161,6 @@ foreach ($indikators_raw as $ind) {
                     <label for="catatan"><strong>Catatan Tambahan</strong></label>
                     <textarea name="catatan" id="catatan" class="form-control" rows="4"
                         placeholder="Tulis catatan penilaian di sini..."></textarea>
-                </div>
-
-                <div class="text-right mt-4">
-                    <h3 class="font-weight-bold text-primary">
-                        TOTAL SCORE: 
-                        <input type="text" id="grand_total_score" class="form-control text-center d-inline-block font-weight-bold" 
-                               style="width: 120px; font-size: 1.25rem;" readonly>
-                        / 4.00
-                    </h3>
                 </div>
 
                 <div class="text-left">
@@ -218,9 +191,7 @@ document.getElementById('unit_id').addEventListener('change', function() {
             .then(res => res.json())
             .then(data => {
                 data.forEach(k => {
-                    const option = document.createElement('option');
-                    option.value = k.karyawan_id;
-                    option.text = k.name;
+                    const option = new Option(k.name, k.karyawan_id);
                     karyawanSelect.add(option);
                 });
             })
@@ -230,44 +201,7 @@ document.getElementById('unit_id').addEventListener('change', function() {
 </script>
 
 <script>
-$(document).ready(function() {
-    
-    // Fungsi untuk menghitung total score
-    function updateScores() {
-        let grandTotal = 0;
-
-        // Loop setiap 'faktor'
-        $('.score-faktor-input').each(function() {
-            const faktorId = $(this).attr('id').split('_')[2];
-            let faktorScore = 0;
-
-            // Loop setiap 'indikator' di dalam faktor ini
-            $(`.nilai-selector[data-faktor-id="${faktorId}"]`).each(function() {
-                const nilai = parseFloat($(this).val()) || 0;       // Nilai 1-4
-                const bobot = parseFloat($(this).data('bobot')) || 0; // Bobot Indikator (cth: 25)
-
-                // RUMUS BARU: Hasil = Nilai * (Bobot / 100)
-                const hasilIndikator = nilai * (bobot / 100);
-                faktorScore += hasilIndikator;
-            });
-
-            // Tampilkan score faktor
-            $(this).val(faktorScore.toFixed(2));
-            grandTotal += faktorScore;
-        });
-
-        // Tampilkan grand total
-        $('#grand_total_score').val(grandTotal.toFixed(2));
-    }
-
-    // Panggil fungsi hitung setiap kali ada nilai berubah
-    $('#formPenilaian').on('change', '.nilai-selector', function() {
-        updateScores();
-    });
-    updateScores(); // Panggil saat load
-});
-
-// Submit Penilaian (Sama seperti kode Anda, tapi dengan konfirmasi)
+// Submit Penilaian
 document.getElementById('formPenilaian').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
@@ -294,10 +228,10 @@ document.getElementById('formPenilaian').addEventListener('submit', function(e) 
                     title: data.success ? 'Berhasil' : 'Gagal',
                     text: data.message
                 }).then(() => {
+                    // Blok ini dieksekusi SETELAH popup ditutup
                     if (data.success) {
                         document.getElementById('formPenilaian').reset();
-                        $('#karyawan_id').html('<option value="">-- Pilih Karyawan --</option>');
-                        updateScores(); // Reset tampilan score
+                        $('#karyawan_id').html('<option value="">-- Pilih Karyawan --</option>');                    
                     }
                 });
             })

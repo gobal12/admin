@@ -1,4 +1,23 @@
-<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+<nav class="navbar navbar-expand navbar-light bg-white topbar shadow">
+
+    <button id="sidebarToggle" class="btn btn-link d-none d-md-inline-block rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+    
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <a class="d-flex align-items-center" 
+       href="charts.php" 
+       style="text-decoration: none; margin-right: 1rem;">
+        
+        <div class="sidebar-brand-icon"> <img src="../img/Logo-Nutech-ok.png" alt="Nutech Logo" style="height: 32px; width: auto;">
+        </div>
+        <div class="sidebar-brand-text mx-2 text-gray-800 font-weight-bold d-none d-sm-inline-block">KPI Nutech</div>
+    </a>
+
+
     <ul class="navbar-nav ml-auto">
         <div class="topbar-divider d-none d-sm-block"></div>
         <li class="nav-item dropdown no-arrow">

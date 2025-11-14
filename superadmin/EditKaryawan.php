@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $jabatan_id      = $_POST['jabatan_id'];
     $unit_project_id = $_POST['unit_project_id'];
     $hire_date       = $_POST['hire_date'];
+    $status          = $_POST['status']; // <-- DATA BARU
 
     $conn->begin_transaction();
 
@@ -43,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt1->execute();
         $stmt1->close();
 
-        // Update tabel karyawans
-        $stmt2 = $conn->prepare("UPDATE karyawans SET karyawan_id=?, jabatan_id=?, unit_project_id=?, hire_date=? WHERE id=?");
-        $stmt2->bind_param("siisi", $karyawan_id, $jabatan_id, $unit_project_id, $hire_date, $karyawan_pk);
+        // Update tabel karyawans (KUERI DAN BIND DIPERBARUI)
+        $stmt2 = $conn->prepare("UPDATE karyawans SET karyawan_id=?, jabatan_id=?, unit_project_id=?, hire_date=?, status=? WHERE id=?");
+        $stmt2->bind_param("siissi", $karyawan_id, $jabatan_id, $unit_project_id, $hire_date, $status, $karyawan_pk);
         $stmt2->execute();
         $stmt2->close();
 
@@ -66,12 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ========== TAMPILAN FORM ==========
     $id = $_GET['id'] ?? 0;
 
-    // Ambil data karyawan dan user
+    // Ambil data karyawan dan user (KUERI DIPERBARUI)
     $sql = "SELECT 
                 u.id as user_id,
                 u.name, u.email, u.role,
                 k.id as karyawan_pk,
-                k.karyawan_id, k.jabatan_id, k.unit_project_id, k.hire_date
+                k.karyawan_id, k.jabatan_id, k.unit_project_id, k.hire_date,
+                k.status /* <-- DATA BARU */
             FROM users u
             JOIN karyawans k ON k.user_id = u.id
             WHERE k.id = ?";
@@ -124,9 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body id="page-top">
 
-<?php include 'layouts/page_start.php'; ?>
+        <?php include 'layouts/page_start.php'; ?>
 
-                <!-- Begin Page Content -->
                 <div class="container fluid">
                     <div class="card-header py-3 bg-primary text-white">
                         <h4 class="m-0 font-weight-bold">Data Karyawan</h4>
@@ -139,10 +140,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="hidden" name="karyawan_pk" value="<?= $data['karyawan_pk'] ?>">
 
                         <label>Nama</label>
-                        <input type="text" name="name" value="<?= $data['name'] ?>" class="form-control" required>
+                        <input type="text" name="name" value="<?= htmlspecialchars($data['name']) ?>" class="form-control" required>
 
                         <label>Email</label>
-                        <input type="email" name="email" value="<?= $data['email'] ?>" class="form-control" required>
+                        <input type="email" name="email" value="<?= htmlspecialchars($data['email']) ?>" class="form-control" required>
 
                         <label>Password (Kosongkan jika tidak ingin diganti)</label>
                         <input type="password" name="password" class="form-control">
@@ -157,13 +158,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
 
                         <label>Karyawan ID</label>
-                        <input type="text" name="karyawan_id" value="<?= $data['karyawan_id'] ?>" class="form-control" required>
+                        <input type="text" name="karyawan_id" value="<?= htmlspecialchars($data['karyawan_id']) ?>" class="form-control" required>
 
                         <label>Jabatan</label>
                         <select name="jabatan_id" class="form-control" required>
                             <?php while($j = $jabatans->fetch_assoc()): ?>
                                 <option value="<?= $j['id'] ?>" <?= $j['id'] == $data['jabatan_id'] ? 'selected' : '' ?>>
-                                    <?= $j['name'] ?>
+                                    <?= htmlspecialchars($j['name']) ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
@@ -172,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select name="unit_project_id" class="form-control" required>
                             <?php while($u = $units->fetch_assoc()): ?>
                                 <option value="<?= $u['id'] ?>" <?= $u['id'] == $data['unit_project_id'] ? 'selected' : '' ?>>
-                                    <?= $u['name'] ?>
+                                    <?= htmlspecialchars($u['name']) ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
@@ -180,14 +181,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label>Hire Date</label>
                         <input type="date" name="hire_date" value="<?= $data['hire_date'] ?>" class="form-control" required>
 
+                        <label>Status</label>
+                        <select name="status" class="form-control" required>
+                            <option value="Aktif" <?= $data['status'] == 'Aktif' ? 'selected' : '' ?>>Aktif</option>
+                            <option value="Non Aktif" <?= $data['status'] == 'Non Aktif' ? 'selected' : '' ?>>Non Aktif</option>
+                        </select>
                         <button type="submit" class="btn btn-primary mt-3">Simpan Perubahan</button>
                     </form>
                     </div>
                 </div>
-                <!-- End of Main Content -->
-
-            <!-- Footer -->
-<?php include 'layouts/footer.php'; ?>
+                <?php include 'layouts/footer.php'; ?>
 
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
