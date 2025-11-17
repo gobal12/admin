@@ -33,6 +33,7 @@ $n = count($faktor);
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <?php include 'layouts/style.php';?>
 
     <title>KPI Nutech Operation - Data Jabatan</title>
 
@@ -149,27 +150,13 @@ $n = count($faktor);
                 <!-- End of Main Content -->
 
             <!-- Footer -->
-
             <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
+    <div>
+</div>
 
-            <!-- End of Footer -->
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="../js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/datatables-demo.js"></script>
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
     
     <!-- Konfirmasi Add Jabatan -->
  <script>

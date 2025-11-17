@@ -83,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <?php include 'layouts/style.php';?>
 
     <title>KPI Nutech Operation - Data Periode</title>
 
@@ -124,35 +125,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <label>Status </label>
                         <select name="status" class="form-control" required>
-                            <option value="Active" <?= $data['status'] == 'Active' ? 'selected' : '' ?>>Active</option>
-                            <option value="Inactive" <?= $data['status'] == 'Inactive' ? 'selected' : '' ?>>Inactive</option>
+                            <option value="Aktif" <?= $data['status'] == 'Active' ? 'selected' : '' ?>>Aktif</option>
+                            <option value="Non Aktif" <?= $data['status'] == 'Inactive' ? 'selected' : '' ?>>Non Aktif</option>
                         </select>
                         
                         <button type="submit" class="btn btn-primary mt-3">Simpan Perubahan</button>
                     </form>
                 </div>
                 <!-- End of Main Content -->
-
             <!-- Footer -->
-<?php include 'layouts/footer.php'; ?>
+            <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
+    <div>
+</div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="../js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/datatables-demo.js"></script>
-    
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
+        
     <!-- Konfirmasi Add Jabatan -->
     <script>
     document.getElementById("formPeriode").addEventListener("submit", function(event) {

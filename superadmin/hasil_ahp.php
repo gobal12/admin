@@ -35,6 +35,8 @@ while ($row = $resUnit->fetch_assoc()) {
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <?php include 'layouts/style.php';?>
+
     <title>Perhitungan AHP</title>
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
@@ -203,17 +205,15 @@ while ($row = $resUnit->fetch_assoc()) {
         </div>
     </div>
 </div>
+
+            <!-- Footer -->
+            <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
+    <div>
 </div>
 
-<?php include 'layouts/footer.php'; ?>
-
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-<script src="../js/sb-admin-2.min.js"></script>
-<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-<script src="../js/demo/datatables-demo.js"></script>
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
 
 </body>
 </html>

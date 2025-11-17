@@ -179,6 +179,7 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <script src="../vendor/chart.js/Chart.min.js"></script>
+    <?php include 'layouts/style.php';?>
 
     <style>
         .table-responsive {
@@ -429,13 +430,14 @@ $low_karyawan_ahp = $conn->query($sql_ahp_base . " ORDER BY pkahp.total_nilai AS
     </main>
 </div>
 
-<?php include 'layouts/footer.php'; ?>
+            <!-- Footer -->
+            <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
+    <div>
+</div>
 
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-<script src="../js/sb-admin-2.min.js"></script>
-<script src="../vendor/chart.js/Chart.min.js"></script>
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
 
 <script>
 // 1. Chart Penilaian (Stacked)

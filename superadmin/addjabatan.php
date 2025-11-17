@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <?php include 'layouts/style.php';?>
 
     <title>KPI Nutech Operation - Data Jabatan</title>
 
@@ -61,59 +62,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!--Konfirmasi Delete -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body id="page-top">
 
 <?php include 'layouts/page_start.php'; ?>
-
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-                    <div class="card-header py-3 bg-primary text-white">
-                        <h4 class="m-0 font-weight-bold">Tambah Jabatan</h4>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="jabatanForm">
-                                <div class="form-group">
-                                    <label for="nama_jabatan">Nama Jabatan</label>
-                                    <input type="text" class="form-control" id="nama_jabatan" name="nama_jabatan" required>
-                                </div>
-                                <button type="submit" class="btn btn-success">Simpan</button>
-                                <a href="datajabatan.php" class="btn btn-secondary">Kembali</a>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
+    <!-- Begin Page Content -->
+        <div class="container-fluid">
+            <div class="card-header py-3 bg-primary text-white">
+                <h4 class="m-0 font-weight-bold">Tambah Jabatan</h4>
             </div>
-            <!-- End of Main Content -->
+            <div class="card">
+                <div class="card-body">
+                    <form id="jabatanForm">
+                        <div class="form-group">
+                            <label for="nama_jabatan">Nama Jabatan</label>
+                                <input type="text" class="form-control" id="nama_jabatan" name="nama_jabatan" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                        <a href="datajabatan.php" class="btn btn-secondary">Kembali</a>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-            <!-- Footer -->
+    <!-- End of Main Content -->
 
-            <?php include 'layouts/footer.php'; ?>
+    <!-- Footer -->
+        <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
+    <div>
+</div>
 
-            <!-- End of Footer -->
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="../js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/datatables-demo.js"></script>
-    
-    <!-- Konfirmasi Add Jabatan -->
- <script>
+ <!-- Konfirmasi Add Jabatan -->
+    <script>
         document.getElementById('jabatanForm').addEventListener('submit', function(event) {
             event.preventDefault();
 

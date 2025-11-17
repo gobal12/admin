@@ -13,34 +13,105 @@ check_role('admin');
 
 $logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
 
-// Cek jika AJAX request untuk ubah password
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password']) && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+// UBAH: Logika AJAX dipindah ke atas dan dirombak total
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
     header("Content-Type: application/json");
-
+    
     $user_id = $_SESSION['user_id'] ?? null;
     if (!$user_id) {
-        echo json_encode(["success" => false, "message" => "Anda belum login."]);
+        echo json_encode(["success" => false, "message" => "Sesi Anda telah berakhir, silakan login kembali."]);
         exit;
     }
 
-    $new_password = trim($_POST['password']);
+    try {
+        // Ambil data baru dari POST
+        $new_email = trim($_POST['email'] ?? '');
+        $new_password = trim($_POST['password'] ?? '');
 
-    if (strlen($new_password) < 6) {
-        echo json_encode(["success" => false, "message" => "Password minimal 6 karakter."]);
-        exit;
-    }
+        // Ambil data email saat ini dari DB untuk perbandingan
+        $stmt_current = $conn->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt_current->bind_param("i", $user_id);
+        $stmt_current->execute();
+        $current_data = $stmt_current->get_result()->fetch_assoc();
+        $current_email = $current_data['email'];
 
-    $hash = password_hash($new_password, PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-    $stmt->bind_param("si", $hash, $user_id);
+        $updates = []; // Menyimpan bagian query SET
+        $params = [];  // Menyimpan nilai untuk binding
+        $types = "";   // Menyimpan tipe data untuk binding
 
-    if ($stmt->execute()) {
-        echo json_encode(["success" => true, "message" => "Password berhasil diubah."]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Gagal mengubah password."]);
+        $email_changed = false;
+        $password_changed = false;
+
+        // --- 1. Proses Perubahan Email ---
+        if (!empty($new_email) && $new_email !== $current_email) {
+            // Validasi format email
+            if (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Format email tidak valid.");
+            }
+            
+            // Cek duplikasi email
+            $stmt_check = $conn->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+            $stmt_check->bind_param("si", $new_email, $user_id);
+            $stmt_check->execute();
+            $stmt_check->store_result();
+            if ($stmt_check->num_rows > 0) {
+                throw new Exception("Email '$new_email' sudah digunakan oleh akun lain.");
+            }
+            
+            // Siapkan untuk update
+            $updates[] = "email = ?";
+            $params[] = $new_email;
+            $types .= "s";
+            $email_changed = true;
+        }
+
+        // --- 2. Proses Perubahan Password ---
+        if (!empty($new_password)) {
+            // Validasi panjang password
+            if (strlen($new_password) < 6) {
+                throw new Exception("Password minimal 6 karakter.");
+            }
+            
+            // Siapkan untuk update
+            $hash = password_hash($new_password, PASSWORD_DEFAULT);
+            $updates[] = "password = ?";
+            $params[] = $hash;
+            $types .= "s";
+            $password_changed = true;
+        }
+
+        // --- 3. Eksekusi Update ke Database ---
+        if (!$email_changed && !$password_changed) {
+            throw new Exception("Tidak ada perubahan yang perlu disimpan.");
+        }
+
+        // Tambahkan user_id di akhir array params untuk klausa WHERE
+        $params[] = $user_id;
+        $types .= "i";
+
+        $query = "UPDATE users SET " . implode(", ", $updates) . " WHERE id = ?";
+        
+        $stmt = $conn->prepare($query);
+        
+        // Bind parameter secara dinamis
+        $stmt->bind_param($types, ...$params);
+
+        if ($stmt->execute()) {
+            // Jika email berubah, update juga di session
+            if ($email_changed) {
+                $_SESSION['email'] = $new_email;
+            }
+            echo json_encode(["success" => true, "message" => "Data berhasil diperbarui."]);
+        } else {
+            throw new Exception("Gagal memperbarui data di database.");
+        }
+
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
     }
     exit;
 }
+// AKHIR UBAHAN BLOK AJAX
 
 // Ambil data user untuk ditampilkan
 $user_id = $_SESSION['user_id'] ?? null;
@@ -85,6 +156,7 @@ if ($result && $result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <?php include 'layouts/style.php';?>
 
     <title>KPI Nutech Operation - Profile</title>
 
@@ -109,17 +181,11 @@ if ($result && $result->num_rows > 0) {
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    <!-- Page Heading -->
-                    <!-- <h1 class="h3 mb-2 text-gray-800">Profile</h1> -->
-
                     <div class="card">
                     <div class="card-header py-3 bg-primary text-white">
                         <h4 class="m-0 font-weight-bold">Informasi Data Diri</h4>
                     </div>
                         <div class="card-group">
-                            <!-- <div class="card">
-                                <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="card-img-top" alt="...">
-                            </div> -->
                             <div class="card">
                                 <div class="card-body">
                                   <h5 class="card-title">Data Diri</h5>
@@ -131,7 +197,7 @@ if ($result && $result->num_rows > 0) {
 
                                         <div class="mb-3">
                                             <label>Email</label>
-                                            <input type="email" class="form-control" value="<?= htmlspecialchars($data['email']) ?>" disabled>
+                                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($data['email']) ?>">
                                         </div>
 
                                         <div class="mb-3">
@@ -162,27 +228,17 @@ if ($result && $result->num_rows > 0) {
                       </div>
                     
                 </div>
+</div>
                 <!-- End of Main Content -->
 
             <!-- Footer -->
             <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
+    <div>
+</div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="../js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/datatables-demo.js"></script>
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -190,17 +246,34 @@ document.getElementById("formUbahPassword").addEventListener("submit", function(
     e.preventDefault();
 
     const formData = new FormData(this);
-    const password = formData.get("password");
+    const password = formData.get("password").trim();
+    const email = formData.get("email").trim();
 
-    if (!password || password.trim().length < 6) {
+    // Validasi 1: Cek format email (validasi sederhana di client)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
         Swal.fire({
             icon: 'warning',
             title: 'Oops...',
-            text: 'Password harus minimal 6 karakter.'
+            text: 'Format email tidak valid.'
         });
         return;
     }
 
+    // Validasi 2: Jika password diisi, pastikan minimal 6 karakter
+    if (password.length > 0 && password.length < 6) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: 'Password minimal 6 karakter (atau biarkan kosong jika tidak diubah).'
+        });
+        return;
+    }
+    
+    // Validasi 3: Cek apakah ada yang diisi (opsional, backend sudah handle)
+    // Kita bisa lewati ini dan biarkan backend yang memberi pesan "Tidak ada perubahan"
+
+    // Kirim data ke server
     fetch("profile.php", {
         method: "POST",
         body: formData,
@@ -215,7 +288,10 @@ document.getElementById("formUbahPassword").addEventListener("submit", function(
                 icon: 'success',
                 title: 'Berhasil',
                 text: data.message
-            }).then(() => location.reload());
+            }).then(() => {
+                // Jika berhasil, reload halaman agar data baru (email) tampil di form
+                location.reload(); 
+            });
         } else {
             Swal.fire({
                 icon: 'error',
@@ -228,7 +304,7 @@ document.getElementById("formUbahPassword").addEventListener("submit", function(
         Swal.fire({
             icon: 'error',
             title: 'Terjadi Kesalahan',
-            text: err.message
+            text: err.message || 'Tidak dapat terhubung ke server.'
         });
     });
 });

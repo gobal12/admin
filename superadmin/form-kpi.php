@@ -44,6 +44,8 @@ foreach ($indikators_raw as $ind) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <?php include 'layouts/style.php';?>
+
     <title>KPI Nutech Operation - Form Penilaian</title>
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900" rel="stylesheet">
@@ -173,12 +175,14 @@ foreach ($indikators_raw as $ind) {
     </div>
 </div>
 
-<?php include 'layouts/footer.php'; ?>
+            <!-- Footer -->
+            <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
+    <div>
+</div>
 
-<script src="../vendor/jquery/jquery.min.js"></script>
-<script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-<script src="../js/sb-admin-2.min.js"></script>
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
 
 <script>
 document.getElementById('unit_id').addEventListener('change', function() {
