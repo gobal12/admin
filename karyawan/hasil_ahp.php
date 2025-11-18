@@ -8,14 +8,32 @@ function check_role($required_role) {
         exit();
     }
 }
-check_role('admin');
+check_role('karyawan');
 
-$logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
-include '../db_connection.php';
+// ==== PERUBAHAN UTAMA: AMBIL DARI USER ID ====
+if (!isset($_SESSION['user_id'])) {
+    die("Error: Sesi tidak valid. 'user_id' tidak ditemukan. Silakan login kembali.");
+}
+$logged_in_user_id = (int)$_SESSION['user_id'];
+$logged_in_user = $_SESSION['name'] ?? 'Guest';
+
+require_once '../db_connection.php';
+
+// Cari karyawan_id dari user_id
+$stmt_karyawan = $conn->prepare("SELECT id FROM karyawans WHERE user_id = ?");
+$stmt_karyawan->bind_param("i", $logged_in_user_id);
+$stmt_karyawan->execute();
+$k_result = $stmt_karyawan->get_result();
+
+if ($k_result->num_rows === 0) {
+    die("Error: Tidak dapat menemukan data karyawan untuk user ini.");
+}
+$logged_in_karyawan_id = (int)$k_result->fetch_assoc()['id'];
+$stmt_karyawan->close();
+// =============================================
 
 // Ambil filter dari GET
 $periode_id = isset($_GET['periode_id']) ? (int)$_GET['periode_id'] : 0;
-$unit_id    = isset($_GET['unit_id']) ? (int)$_GET['unit_id'] : 0;
 
 // Ambil daftar periode
 $periodeList = [];
@@ -23,22 +41,15 @@ $resPeriode = $conn->query("SELECT id, nama_periode FROM periode_penilaian ORDER
 while ($row = $resPeriode->fetch_assoc()) {
     $periodeList[] = $row;
 }
-
-// Ambil daftar unit / project
-$unitList = [];
-$resUnit = $conn->query("SELECT id, name FROM unit_projects ORDER BY name ASC");
-while ($row = $resUnit->fetch_assoc()) {
-    $unitList[] = $row;
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <?php include 'layouts/style.php';?>
-
-    <title>Perhitungan AHP</title>
+    <title>Hasil AHP Saya</title>
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -49,7 +60,7 @@ while ($row = $resUnit->fetch_assoc()) {
 
 <div class="container-fluid">
     <div class="card-header py-3 bg-primary text-white">
-        <h4 class="m-0 font-weight-bold">Data Hasil AHP</h4>
+        <h4 class="m-0 font-weight-bold">Data Hasil AHP Saya</h4>
         <p class="mb-4">Menampilkan Data perhitungan AHP</p>
     </div>
 
@@ -57,7 +68,7 @@ while ($row = $resUnit->fetch_assoc()) {
         <div class="card-body">
             
             <form method="GET" class="mb-3 row">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label for="periode_id">Filter Periode:</label>
                     <select name="periode_id" id="periode_id" class="form-control" onchange="this.form.submit()">
                         <option value="0" <?= $periode_id === 0 ? 'selected' : '' ?>>-- Semua Periode --</option>
@@ -68,40 +79,13 @@ while ($row = $resUnit->fetch_assoc()) {
                         <?php endforeach; ?>
                     </select>
                 </div>
-
-                <div class="col-md-3">
-                    <label for="unit_id">Filter Unit / Project:</label>
-                    <select name="unit_id" id="unit_id" class="form-control" onchange="this.form.submit()">
-                        <option value="0" <?= $unit_id === 0 ? 'selected' : '' ?>>-- Semua Unit / Project --</option>
-                        <?php foreach ($unitList as $u): ?>
-                            <option value="<?= $u['id'] ?>" <?= $unit_id === (int)$u['id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($u['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="col-md-6 d-flex align-items-end justify-content-end">
-                    <a href="cetak_all_ahp.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
-                    target="_blank" 
-                    class="btn btn-success ml-auto">
-                        <i class="fas fa-print"></i> Cetak Semua
-                    </a>
-
-                    <a href="export_excel_ahp.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
-                    class="btn btn-info ml-2">
-                        <i class="fas fa-file-excel"></i> Export Excel
-                    </a>
-                </div>
             </form>
 
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th >No</th>
-                            <th>Nama</th>
-                            <th>Unit / Project</th>
+                            <th>No</th>
                             <th>Periode</th>
                             <?php
                             // Ambil daftar faktor untuk header kolom
@@ -113,7 +97,8 @@ while ($row = $resUnit->fetch_assoc()) {
                             }
                             ?>
                             <th>Nilai Akhir</th>
-                            <th>Aksi</th> </tr>
+                            <th>Aksi</th> 
+                        </tr>
                     </thead>
                     <tbody>
                         <?php
@@ -132,24 +117,19 @@ while ($row = $resUnit->fetch_assoc()) {
                             JOIN users u ON u.id = k.user_id
                             JOIN periode_penilaian pp ON pp.id = pkahp.periode_id
                             JOIN unit_projects up ON k.unit_project_id = up.id
-                            WHERE 1=1
+                            WHERE pkahp.karyawan_id = ? -- <-- PERUBAHAN UTAMA
                         ";
 
-                        $params = [];
-                        $types = "";
+                        $params = [$logged_in_karyawan_id]; // <-- PERUBAHAN UTAMA
+                        $types = "i"; // <-- PERUBAHAN UTAMA
 
                         if ($periode_id > 0) {
                             $sql .= " AND pkahp.periode_id = ? ";
                             $params[] = $periode_id;
                             $types .= "i";
                         }
-                        if ($unit_id > 0) {
-                            $sql .= " AND k.unit_project_id = ? ";
-                            $params[] = $unit_id;
-                            $types .= "i";
-                        }
 
-                        $sql .= " ORDER BY pkahp.total_nilai DESC, pp.id DESC, u.name";
+                        $sql .= " ORDER BY pp.id DESC, u.name";
 
                         $stmt = $conn->prepare($sql);
                         if (!empty($params)) {
@@ -168,10 +148,8 @@ while ($row = $resUnit->fetch_assoc()) {
                         }
 
                         while ($row = $result->fetch_assoc()) {
-                            echo "<tr style='white-space: nowrap;'>";
+                            echo "<tr>";
                             echo "<td>" . $no++ . "</td>";
-                            echo "<td>" . htmlspecialchars($row['nama_karyawan']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['nama_unit']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['nama_periode']) . "</td>";
 
                             foreach ($faktorList as $f) {
@@ -182,18 +160,11 @@ while ($row = $resUnit->fetch_assoc()) {
 
                             echo "<td>" . number_format($row['total_nilai'], 4) . "</td>";
                             
-                            // TOMBOL AKSI BARU
                             echo '<td style="white-space: nowrap;">
                                     <a href="detail_ahp.php?penilaian_id=' . htmlspecialchars($row['penilaian_id']) . '" 
                                     class="btn btn-outline-info btn-sm" 
                                     title="Lihat Detail Penilaian">
                                     <i class="fas fa-eye"></i> Detail
-                                    </a>
-
-                                    <a href="cetak_ahp.php?penilaian_id=' . htmlspecialchars($row['penilaian_id']) . '" 
-                                    class="btn btn-outline-primary btn-sm" 
-                                    title="Cetak Penilaian" target="_blank">
-                                    <i class="fas fa-print"></i> Cetak
                                     </a>
                                 </td>';
                             echo "</tr>";
@@ -206,14 +177,8 @@ while ($row = $resUnit->fetch_assoc()) {
     </div>
 </div>
 
-            <!-- Footer -->
             <?php include 'layouts/footer.php'; ?>
-    <!-- End of Footer -->
-    <div>
-</div>
-
-<!-- End Page Wrapper -->
-        <?php include 'layouts/page_end.php'; ?>
+            <?php include 'layouts/page_end.php'; ?>
 
 </body>
 </html>

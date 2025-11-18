@@ -9,7 +9,7 @@ function check_role($required_role) {
     }
 }
 
-check_role('admin');
+check_role('hrd');
 
 // Ambil nama user dari session
 $logged_in_user = $_SESSION['name'] ?? 'Guest';
@@ -163,7 +163,7 @@ $unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name AS
                                     if ($result->num_rows > 0): 
                                         while ($row = $result->fetch_assoc()):
                                     ?>
-                                        <tr style="white-space: nowrap;">
+                                        <tr>
                                             <td><?= $no++ ?></td>
                                             <td><?= htmlspecialchars($row['nama_karyawan']) ?></td>
                                             <td><?= htmlspecialchars($row['unit_project']) ?></td>

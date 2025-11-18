@@ -8,7 +8,7 @@ function check_role($required_role) {
         exit();
     }
 }
-check_role('admin');
+check_role('hrd');
 
 $logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
 include '../db_connection.php';
@@ -99,7 +99,7 @@ while ($row = $resUnit->fetch_assoc()) {
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th >No</th>
+                            <th>No</th>
                             <th>Nama</th>
                             <th>Unit / Project</th>
                             <th>Periode</th>
@@ -168,7 +168,7 @@ while ($row = $resUnit->fetch_assoc()) {
                         }
 
                         while ($row = $result->fetch_assoc()) {
-                            echo "<tr style='white-space: nowrap;'>";
+                            echo "<tr>";
                             echo "<td>" . $no++ . "</td>";
                             echo "<td>" . htmlspecialchars($row['nama_karyawan']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['nama_unit']) . "</td>";

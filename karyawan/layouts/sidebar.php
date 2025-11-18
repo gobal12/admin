@@ -54,13 +54,6 @@
             Penilaian
         </div>
 
-        <li class="nav-item <?php echo ($current_page == 'form-kpi.php') ? 'active' : ''; ?>">
-            <a class="nav-link" href="form-kpi.php" title="Input Penilaian Kinerja">
-                <i class="fas fa-fw fa-edit"></i>
-                <span>Input Penilaian</span>
-            </a>
-        </li>
-
         <li class="nav-item <?php echo $is_laporan_active ? 'active' : ''; ?>">
             <a class="nav-link <?php echo !$is_laporan_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseLaporan" title="Laporan Kinerja">
                 <i class="fas fa-fw fa-chart-area"></i>
@@ -77,7 +70,7 @@
 
         <hr class="sidebar-divider">
 
-        <div class="sidebar-heading">
+        <!-- <div class="sidebar-heading">
             Admin & Setup
         </div>
 
@@ -106,7 +99,7 @@
             </div>
         </li>
 
-        <hr class="sidebar-divider d-none d-md-block">
+        <hr class="sidebar-divider d-none d-md-block"> -->
 
         <li class="nav-item <?php echo $is_profile_active ? 'active' : ''; ?>">
             <a class="nav-link <?php echo !$is_profile_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseProfile">

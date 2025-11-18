@@ -50,7 +50,7 @@
 
         <hr class="sidebar-divider">
 
-        <div class="sidebar-heading">
+        <!-- <div class="sidebar-heading">
             Penilaian
         </div>
 
@@ -59,7 +59,7 @@
                 <i class="fas fa-fw fa-edit"></i>
                 <span>Input Penilaian</span>
             </a>
-        </li>
+        </li> -->
 
         <li class="nav-item <?php echo $is_laporan_active ? 'active' : ''; ?>">
             <a class="nav-link <?php echo !$is_laporan_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseLaporan" title="Laporan Kinerja">
@@ -121,9 +121,9 @@
             </div>
         </li>
 
-        <!-- <hr class="sidebar-divider d-none d-md-block">
+        <hr class="sidebar-divider d-none d-md-block">
 
-        <li class="nav-item <?php echo ($current_page == 'adduser.php') ? 'active' : ''; ?>">
+        <!-- <li class="nav-item <?php echo ($current_page == 'adduser.php') ? 'active' : ''; ?>">
             <a class="nav-link" href="adduser.php" title="Adduser">
                 <i class="fas fa-user-plus"></i>
                 <span>Tambah User</span>

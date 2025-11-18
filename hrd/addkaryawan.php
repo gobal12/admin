@@ -9,41 +9,45 @@ function check_role($required_role) {
     }
 }
 
-check_role('admin');
+check_role('hrd');
 
 $logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
 
 include '../db_connection.php';
 
-// // Ambil data jabatan & unit_project untuk select option
-// $jabatan = $conn->query("SELECT id, name FROM jabatans");
-// $unit = $conn->query("SELECT id, name FROM unit_projects");
+// Ambil data jabatan & unit_project untuk select option
+$jabatan = $conn->query("SELECT id, name FROM jabatans");
+$unit = $conn->query("SELECT id, name FROM unit_projects");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Ambil data
     $nama         = $_POST['nama'] ?? '';
     $email        = $_POST['email'] ?? '';
+    $karyawan_id  = $_POST['karyawan_id'] ?? '';
+    $jabatan_id   = $_POST['jabatan_id'] ?? '';
+    $unit_id      = $_POST['unit_id'] ?? '';
+    $hire_date    = $_POST['hire_date'] ?? '';
     $password     = password_hash('Nutech123', PASSWORD_DEFAULT);
-    // $role         = 'karyawan'; // <-- HAPUS BARIS INI
-    $role         = $_POST['role'] ?? ''; // <-- GANTI DENGAN BARIS INI
+    $role         = 'karyawan';
 
-    // Validasi sederhana untuk role (opsional tapi disarankan)
-    $allowed_roles = ['admin', 'hrd', 'manager', 'karyawan'];
-    if (empty($role) || !in_array($role, $allowed_roles)) {
-        echo json_encode(['success' => false, 'message' => 'Role yang dipilih tidak valid.']);
-        exit;
-    }
-
+    // Ganti ke unit_project_id
+    $unit_project_id = $unit_id;
 
     $conn->begin_transaction(); // ✅ Mulai transaksi
 
     try {
         // Insert ke tabel users
         $stmt1 = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
-        $stmt1->bind_param("ssss", $nama, $email, $password, $role); // Variabel $role sudah dinamis
+        $stmt1->bind_param("ssss", $nama, $email, $password, $role);
         $stmt1->execute();
         $user_id = $stmt1->insert_id;
         $stmt1->close();
+
+        // Insert ke tabel karyawans
+        $stmt2 = $conn->prepare("INSERT INTO karyawans (karyawan_id, user_id, jabatan_id, unit_project_id, hire_date) VALUES (?, ?, ?, ?, ?)");
+        $stmt2->bind_param("siiis", $karyawan_id, $user_id, $jabatan_id, $unit_project_id, $hire_date);
+        $stmt2->execute();
+        $stmt2->close();
 
         $conn->commit(); // ✅ Commit jika berhasil semua
         echo json_encode(['success' => true, 'message' => 'Data berhasil ditambahkan.']);
@@ -69,28 +73,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <title>KPI Nutech Operation - Data Jabatan</title>
 
+    <!-- Custom fonts for this template -->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
+    <!-- Custom styles for this template -->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
+    <!-- Custom styles for this page -->
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+    <!--Konfirmasi Delete -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body id="page-top">
 
 <?php include 'layouts/page_start.php'; ?>
 
+                <!-- Begin Page Content -->
                 <div class="container fluid">
                     <div class="card-header py-3 bg-primary text-white">
-                        <h4 class="m-0 font-weight-bold">Tambah User</h4>
+                        <h4 class="m-0 font-weight-bold">Tambah Karyawan</h4>
                     </div>
+
                     <div class="card-body">
-                    <form id="formUser">
+                        <form id="formKaryawan">
                         <div class="form-group mb-3">
                             <label>Nama</label>
                             <input type="text" class="form-control" name="nama" required>
@@ -99,36 +110,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label>Email</label>
                             <input type="email" class="form-control" name="email" required>
                         </div>
-                        
                         <div class="form-group mb-3">
-                            <label>Role</label>
-                            <select class="form-control" name="role" required>
-                                <option value="" disabled selected>Pilih Role</option>
-                                <option value="admin">Admin</option>
-                                <option value="hrd">HRD</option>
-                                <option value="manager">Manager</option>
-                                <option value="karyawan">Karyawan</option>
+                            <label>ID Karyawan</label>
+                            <input type="text" class="form-control" name="karyawan_id" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Jabatan</label>
+                            <select class="form-control" name="jabatan_id" required>
+                                <option value="">Pilih Jabatan</option>
+                                <?php
+                                $q = $conn->query("SELECT id, name FROM jabatans");
+                                while ($row = $q->fetch_assoc()) {
+                                    echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                                }
+                                ?>
                             </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Unit/Project</label>
+                            <select class="form-control" name="unit_id" required>
+                                <option value="">Pilih Unit/Project</option>
+                                <?php
+                                $q = $conn->query("SELECT id, name FROM unit_projects");
+                                while ($row = $q->fetch_assoc()) {
+                                    echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Tanggal Hire</label>
+                            <input type="date" class="form-control" name="hire_date" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Simpan</button>
                         <a href="datakaryawan.php" class="btn btn-secondary">Kembali</a>
                     </form>
                     </div>
                 </div>
+            <!-- End of Main Content -->
 
+            <!-- Footer -->
             <?php include 'layouts/footer.php'; ?>
+    <!-- End of Footer -->
     <div>
 </div>
 
-<?php include 'layouts/page_end.php'; ?>
-    
+<!-- End Page Wrapper -->
+        <?php include 'layouts/page_end.php'; ?>
+
+    <!-- Konfirmasi Add Karyawan -->
     <script>
-    document.getElementById("formUser").addEventListener("submit", function(event) {
+    document.getElementById("formKaryawan").addEventListener("submit", function(event) {
         event.preventDefault();
 
         const formData = new FormData(this);
 
-        fetch("", { // Action URL dikosongkan agar request ke halaman ini sendiri
+        fetch("", {
             method: "POST",
             body: formData
         })
@@ -138,10 +175,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil',
-                    text: 'Data user berhasil ditambahkan.'
+                    text: 'Data karyawan berhasil ditambahkan.'
                 }).then(() => {
-                    // Arahkan ke datakaryawan.php atau reset form di halaman ini
-                    window.location.href = 'datakaryawan.php'; // Diubah agar ke daftar karyawan
+                    window.location.href = 'datakaryawan.php';
                 });
             } else {
                 Swal.fire({

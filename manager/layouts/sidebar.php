@@ -77,7 +77,7 @@
 
         <hr class="sidebar-divider">
 
-        <div class="sidebar-heading">
+        <!-- <div class="sidebar-heading">
             Admin & Setup
         </div>
 
@@ -106,7 +106,7 @@
             </div>
         </li>
 
-        <hr class="sidebar-divider d-none d-md-block">
+        <hr class="sidebar-divider d-none d-md-block"> -->
 
         <li class="nav-item <?php echo $is_profile_active ? 'active' : ''; ?>">
             <a class="nav-link <?php echo !$is_profile_active ? 'collapsed' : ''; ?>" href="#" data-toggle="collapse" data-target="#collapseProfile">

@@ -9,7 +9,7 @@ function check_role($required_role) {
         exit();
     }
 }
-check_role('admin');
+check_role('manager');
 
 $logged_in_user = $_SESSION['name'] ?? 'Guest';
 
