@@ -9,19 +9,31 @@ function check_role($required_role) {
     }
 }
 
-check_role('hrd');
+check_role('admin');
 
 $logged_in_user = isset($_SESSION['name']) ? $_SESSION['name'] : 'Guest';
 
 include '../db_connection.php';
 
-// Ambil data nama faktor saja
+// Ambil data faktor (Id dan Nama)
+// **PENTING: Kita perlu ID dan NAMA di sini**
 $faktor = [];
-$res = $conn->query("SELECT nama FROM faktor_kompetensi ORDER BY id");
+$res = $conn->query("SELECT id, nama FROM faktor_kompetensi ORDER BY id");
 while ($row = $res->fetch_assoc()) {
-    $faktor[] = $row['nama'];  // hanya simpan nama sebagai string
+    $faktor[] = $row; // Simpan array asosiatif (ID dan Nama)
 }
 $n = count($faktor);
+
+// AMBIL DATA MATRIX YANG SUDAH ADA (jika ada)
+$saved_matrix = [];
+$resMx = $conn->query("SELECT faktor_id_1, faktor_id_2, nilai FROM ahp_matrix");
+while ($row = $resMx->fetch_assoc()) {
+    // Kita simpan dengan format key: "ID_BARIS-ID_KOLOM"
+    $key = $row['faktor_id_1'] . '-' . $row['faktor_id_2'];
+    $saved_matrix[$key] = $row['nilai'];
+}
+
+// **CATATAN: Hapus blok kode lama yang hanya mengambil nama faktor saja, karena sudah digabung di atas**
 ?>
 
 <!DOCTYPE html>
@@ -35,21 +47,17 @@ $n = count($faktor);
     <meta name="author" content="">
     <?php include 'layouts/style.php';?>
 
-    <title>KPI Nutech Operation - Data Jabatan</title>
+    <title>KPI Nutech Operation - Input AHP</title>
 
-    <!-- Custom fonts for this template -->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
-    <!-- Custom styles for this template -->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this page -->
     <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
-    <!--Konfirmasi Delete -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -57,7 +65,6 @@ $n = count($faktor);
 
 <?php include 'layouts/page_start.php'; ?>
 
-                <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <div class="card-header py-3 bg-primary text-white">
                         <h4 class="m-0 font-weight-bold">Input Perbandingan Faktor AHP</h4>
@@ -78,15 +85,15 @@ $n = count($faktor);
         </li>
         <li>
             Contoh: Jika 
-            <strong><?php echo htmlspecialchars($faktor[0]); ?></strong> 
+            <strong><?php echo htmlspecialchars($faktor[0]['nama'] ?? ''); ?></strong> 
             lebih penting <strong>3 kali</strong> dibanding 
-            <strong><?php echo htmlspecialchars($faktor[1]); ?></strong>, 
+            <strong><?php echo htmlspecialchars($faktor[1]['nama'] ?? ''); ?></strong>, 
             maka isi angka <strong>3</strong> pada baris 
-            <strong><?php echo htmlspecialchars($faktor[0]); ?></strong> kolom 
-            <strong><?php echo htmlspecialchars($faktor[1]); ?></strong>. 
+            <strong><?php echo htmlspecialchars($faktor[0]['nama'] ?? ''); ?></strong> kolom 
+            <strong><?php echo htmlspecialchars($faktor[1]['nama'] ?? ''); ?></strong>. 
             Sistem akan otomatis mengisi <strong>0.333</strong> pada baris 
-            <strong><?php echo htmlspecialchars($faktor[1]); ?></strong> kolom 
-            <strong><?php echo htmlspecialchars($faktor[0]); ?></strong>.
+            <strong><?php echo htmlspecialchars($faktor[1]['nama'] ?? ''); ?></strong> kolom 
+            <strong><?php echo htmlspecialchars($faktor[0]['nama'] ?? ''); ?></strong>.
         </li>
         <li>Kolom diagonal (nilai perbandingan dengan dirinya sendiri) selalu <strong>1</strong>.</li>
     </ul>
@@ -96,32 +103,42 @@ $n = count($faktor);
                                 <thead>
                                     <tr>
                                         <th>Faktor</th>
-                                        <?php foreach ($faktor as $namaFaktor): ?>
-                                            <th><?= htmlspecialchars($namaFaktor) ?></th>
+                                        <?php foreach ($faktor as $fk): ?>
+                                            <th><?= htmlspecialchars($fk['nama']) ?></th>
                                         <?php endforeach; ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php for ($i = 0; $i < $n; $i++): ?>
-                                        <tr>
-                                            <th><?= htmlspecialchars($faktor[$i]) ?></th>
-                                            <?php for ($j = 0; $j < $n; $j++): ?>
-                                                <?php if ($i == $j): ?>
-                                                    <td><input type="number" value="1" readonly class="form-control"></td>
-                                                <?php elseif ($i < $j): ?>
-                                                    <td>
-                                                        <input type="number" step="any" min="0.1111" max="9"
-                                                            name="matrix[<?= $i ?>][<?= $j ?>]"
-                                                            class="form-control" required />
-                                                    </td>
-                                                <?php else: ?>
-                                                    <td>
-                                                        <input type="number" readonly class="form-control bg-light" id="mirror_<?= $i ?>_<?= $j ?>" />
-                                                    </td>
-                                                <?php endif; ?>
-                                            <?php endfor; ?>
-                                        </tr>
-                                    <?php endfor; ?>
+                                <?php for ($i = 0; $i < $n; $i++): ?>
+                                    <tr>
+                                        <th><?= htmlspecialchars($faktor[$i]['nama']) ?></th>
+                                        <?php for ($j = 0; $j < $n; $j++): ?>
+                                            
+                                            <?php 
+                                                // Key untuk mencari data lama
+                                                $key_db = $faktor[$i]['id'] . '-' . $faktor[$j]['id'];
+                                                $saved_val = isset($saved_matrix[$key_db]) ? $saved_matrix[$key_db] : '';
+                                            ?>
+
+                                            <?php if ($i == $j): ?>
+                                                <td><input type="number" value="1" readonly class="form-control"></td>
+                                            <?php elseif ($i < $j): ?>
+                                                <td>
+                                                    <input type="number" step="any" min="0.1111" max="9"
+                                                        name="matrix[<?= $i ?>][<?= $j ?>]"
+                                                        value="<?= $saved_val ?>" 
+                                                        class="form-control" required />
+                                                </td>
+                                            <?php else: ?>
+                                                <td>
+                                                    <input type="number" readonly class="form-control bg-light" 
+                                                        id="mirror_<?= $i ?>_<?= $j ?>" 
+                                                        value="<?= $saved_val ?>" />
+                                                </td>
+                                            <?php endif; ?>
+                                        <?php endfor; ?>
+                                    </tr>
+                                <?php endfor; ?>
                                 </tbody>
                             </table>
 
@@ -130,13 +147,12 @@ $n = count($faktor);
                     </div>
 
                     <script>
-                    document.querySelectorAll('input[type="number"]').forEach(function(input) {
+                    document.querySelectorAll('input[name^="matrix"]').forEach(function(input) {
                         input.addEventListener('input', function() {
                             let name = this.name;
-                            if (!name) return;
                             let match = name.match(/matrix\[(\d+)\]\[(\d+)\]/);
                             if (match) {
-                                let i = match[1], j = match[2];
+                                let i = parseInt(match[1]), j = parseInt(match[2]);
                                 let val = parseFloat(this.value);
                                 if (val && val > 0) {
                                     let reverse = (1 / val).toFixed(4);
@@ -147,39 +163,39 @@ $n = count($faktor);
                         });
                     });
                     </script>
-                <!-- End of Main Content -->
-
-            <!-- Footer -->
-            <?php include 'layouts/footer.php'; ?>
-    <!-- End of Footer -->
+                <?php include 'layouts/footer.php'; ?>
     <div>
 </div>
 
-<!-- End Page Wrapper -->
-        <?php include 'layouts/page_end.php'; ?>
+<?php include 'layouts/page_end.php'; ?>
     
-    <!-- Konfirmasi Add Jabatan -->
- <script>
-        document.getElementById('jabatanForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+    <script>
+        document.getElementById('ahpForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah submit form standar
 
             const formData = new FormData(this);
-            fetch('', {
+            
+            // Mengirim request ke ahp_process.php
+            fetch('ahp_process.php', { // Pastikan URL benar
                 method: 'POST',
                 body: formData
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    Swal.fire('Berhasil', 'Jabatan berhasil ditambahkan', 'success')
-                        .then(() => window.location.href = 'datajabatan.php');
+                    Swal.fire({
+                        title: 'Berhasil!', 
+                        html: `Bobot Berhasil Diupdate.<br>Status Konsistensi: <b>${data.consistency}</b>`, 
+                        icon: 'success'
+                    })
+                    .then(() => window.location.href = 'ahp_result.php');
                 } else {
-                    Swal.fire('Gagal', data.message || 'Terjadi kesalahan', 'error');
+                    Swal.fire('Gagal', data.message || 'Terjadi kesalahan saat menyimpan data.', 'error');
                 }
             })
             .catch(err => {
                 console.error(err);
-                Swal.fire('Error', 'Gagal mengirim data', 'error');
+                Swal.fire('Error', 'Gagal mengirim data ke server. Cek koneksi.', 'error');
             });
         });
     </script>

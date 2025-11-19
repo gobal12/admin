@@ -91,7 +91,7 @@ $unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name AS
 <?php include 'layouts/page_start.php'; ?>
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
+            <div class="container-fluid">
 
                     <!-- Page Heading -->
                     <div class="card-header py-3 bg-primary text-white">
@@ -99,13 +99,14 @@ $unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name AS
                         <p class="mb-4">Menampilkan Data KPI yang sudah di Input</p>
                     </div>
 
-                    <!-- DataTales Example --><div class="card shadow mb-4">   
+                    <!-- DataTales Example -->
+                <div class="card shadow mb-4">   
                     <div class="card-body">
                         <div class="table-responsive">
-                    <!-- Form Filter + Tombol Cetak -->
-                    <form method="GET" class="mb-3 row">
-                        <!-- Filter Periode -->
-                        <div class="col-md-4">
+                            <!-- Form Filter + Tombol Cetak -->
+                            <form method="GET" class="mb-3 row">
+                            <!-- Filter Periode -->
+                            <div class="col-md-4">
                             <label for="periode_id">Filter Periode:</label>
                             <select name="periode_id" id="periode_id" class="form-control" onchange="this.form.submit()">
                                 <option value="0" <?= $periode_id === 0 ? 'selected' : '' ?>>-- Semua Periode --</option>
@@ -115,35 +116,35 @@ $unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name AS
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
+                            </div>
 
-                        <!-- Filter Unit -->
-                        <div class="col-md-4">
-                            <label for="unit_id">Filter Unit / Project:</label>
-                            <select name="unit_id" id="unit_id" class="form-control" onchange="this.form.submit()">
-                                <option value="0" <?= $unit_id === 0 ? 'selected' : '' ?>>-- Semua Unit / Project --</option>
-                                <?php foreach ($unitList as $u): ?>
-                                    <option value="<?= $u['id'] ?>" <?= $unit_id === (int)$u['id'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($u['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                            <!-- Filter Unit -->
+                            <div class="col-md-4">
+                                <label for="unit_id">Filter Unit / Project:</label>
+                                <select name="unit_id" id="unit_id" class="form-control" onchange="this.form.submit()">
+                                    <option value="0" <?= $unit_id === 0 ? 'selected' : '' ?>>-- Semua Unit / Project --</option>
+                                    <?php foreach ($unitList as $u): ?>
+                                        <option value="<?= $u['id'] ?>" <?= $unit_id === (int)$u['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($u['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
-                        <!-- Tombol Cetak Semua & Download Excel-->
-                        <div class="col-md-4 d-flex align-items-end">
-                            <a href="cetak_all_kpi.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
-                            target="_blank" 
-                            class="btn btn-success ml-auto">
-                                <i class="fas fa-print"></i> Cetak Semua
-                            </a>
+                            <!-- Tombol Cetak Semua & Download Excel-->
+                            <div class="col-md-4 d-flex align-items-end">
+                                <a href="cetak_all_kpi.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
+                                target="_blank" 
+                                class="btn btn-success ml-auto">
+                                    <i class="fas fa-print"></i> Cetak Semua
+                                </a>
 
-                            <a href="export_excel.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
-                            class="btn btn-info ml-2">
-                                <i class="fas fa-file-excel"></i> Export Excel
-                            </a>
-                        </div>
-                    </form>
+                                <a href="export_excel.php?periode_id=<?= $periode_id ?>&unit_id=<?= $unit_id ?>" 
+                                class="btn btn-info ml-2">
+                                    <i class="fas fa-file-excel"></i> Export Excel
+                                </a>
+                            </div>
+                            </form>
                             <!-- Tabel Data -->
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
@@ -194,14 +195,13 @@ $unitList    = $conn->query("SELECT id, name FROM unit_projects ORDER BY name AS
                         </div>
                     </div>
                 </div>
-                </div>
-
+            </div>
                 <!-- /.container-fluid -->
             <!-- Footer -->
             <?php include 'layouts/footer.php'; ?>
     <!-- End of Footer -->
-    <div>
-</div>
+        <div>
+    </div>
 
 <!-- End Page Wrapper -->
         <?php include 'layouts/page_end.php'; ?>

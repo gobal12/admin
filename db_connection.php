@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $dbPassword = "";
-$dbname = "admin";
+$dbname = "db_kpi";
 
 // Create connection to database
 $conn = new mysqli($servername, $username, $dbPassword, $dbname);
